@@ -5,6 +5,10 @@
             <h3>{{project.name}}</h3>
         </div>
     </div>
+    <div class = "date">
+        <img class = "calendarIcon" src="../../../public//CalendarIcon.png" alt="Calendar image" />
+        <p class = "datep">Last activity : {{this.date.dateDDMMYY}} at {{this.date.dateTime}}</p>
+    </div>
 
     <div class="members">
         <div v-bind:key="member.id" v-for="member in displayMember">
@@ -13,7 +17,7 @@
     </div>
   
     <div class = "projectDetails">
-        <p>Last activity : {{project.last_activity_at}}</p>
+        
         <p>Tags : {{project.tag_list}}</p>
         <p>Owner : {{project.owner}}</p>
 
@@ -48,6 +52,7 @@
                 contributors : [],
                 events: [],
                 pipelines: [],
+                date: {},
             }
         },
         methods:{
@@ -57,7 +62,11 @@
         },
 
         created(){
-
+            var date = new Date(this.project.last_activity_at).toLocaleDateString();
+            var dateTime = new Date(this.project.last_activity_at).toLocaleTimeString()
+            this.$set(this.date,"dateDDMMYY",date)
+            this.$set(this.date,"dateTime",dateTime)
+            console.log(this.date)
             // Loads events of project (add members, commits, etc...)
             axios.get(this.project._links.events,{
             headers: {
@@ -208,7 +217,7 @@
         width: 100%;
     }
     .members{
-        margin-top:1em;
+
     }
 
     .projectDetails{
@@ -216,14 +225,31 @@
         margin-top: 1em;
     }
 
+    .date{
+        margin-left:0.5em;
+        display: inline-flex;
+    }
+
+    .datep{
+        margin: auto;
+        padding: auto;
+    }
+    .calendarIcon{
+        margin-top: 1em;
+        width: 2em;
+        margin: auto;
+        padding: auto;
+    }
+
     .projectName{
         width: 100%;
+        display: inline-flex;
     }
     .hrefProjectwrap{
         margin-left:2em;
         padding: 0.5em;
         border-radius: 10px;
-        display: inline-block;
+        display: inline-flex;
         cursor: pointer;
     }
     .hrefProjectwrap:hover{
