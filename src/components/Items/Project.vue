@@ -2,7 +2,7 @@
   <div class="project">
     <h3>{{project.name}}</h3>
     <div v-bind:key="member.id" v-for="member in displayMember">
-        <h5>{{member}} </h5>
+        <Member v-bind:member=member />
     </div>
     <p>Last activity : {{project.last_activity_at}}</p>
     <p>Tags : {{project.tag_list}}</p>
@@ -20,11 +20,14 @@
 </template>
 
 <script>
-
+    import Member from "./DisplayItem/Member"
     import axios from "axios";
 
     export default {
         name: "Project",
+        components:{
+            Member,
+        },
         props: ["project"],
 
         data(){
@@ -148,7 +151,6 @@
                         })
                         .then((resDetail) => {
                             this.$set(this.pipelines[pipelineIndex],"details",resDetail.data)
-                            console.log(this.pipelines[pipelineIndex])
                         })
                         .catch((error) => {
                         console.error(error)
@@ -164,7 +166,6 @@
                         })
                         .then((resSummary) => {
                             this.$set(this.pipelines[pipelineIndex],"summary",resSummary.data)
-                            console.log(this.pipelines[pipelineIndex])
                         })
                         .catch((error) => {
                         console.error(error)
