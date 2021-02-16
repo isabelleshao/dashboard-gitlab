@@ -1,13 +1,15 @@
 <template>
   <div>
     <Header />
-    <ProjectList />
+    <Search @new-search="logResult" />
+    <ProjectList v-bind:projects="projects"/>
   </div>
 </template>
 
 <script>
 import Header from './components/TopPanel/Header';
 import ProjectList from './components/Items/ProjectList';
+import Search from './components/Search/Search';
 import axios from 'axios';
 
 export default {
@@ -15,10 +17,12 @@ export default {
   components: {
     Header,
     ProjectList,
+    Search,
   },
   data(){
     return {
       projects : [],
+      search: [],
     }
   },
   created(){
@@ -30,11 +34,16 @@ export default {
       }
     })
     .then((res) => {
-    this.projects = res.data
+      this.projects = res.data
     })
     .catch((error) => {
       console.error(error)
     })
+  },
+  methods:{
+    logResult(res){
+      this.search = [... this.search, res] 
+    }
   }
 }
 </script>

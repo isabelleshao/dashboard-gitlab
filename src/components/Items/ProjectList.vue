@@ -1,6 +1,8 @@
 <template>
   <div>
-    <Project/>
+    <div v-bind:key="project.id" v-for="project in projects">
+        <Project v-bind:project="project" />
+    </div>
   </div>
 </template>
 
