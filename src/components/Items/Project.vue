@@ -28,9 +28,9 @@
          
               <a :href="pipeline.web_url" target="_blank">{{pipeline.id}}</a>   {{pipeline.status}} {{pipeline.updated_at}} 
              </li></ul> 
-            
+             
     -->
- </p>
+</p>
   </div>
 </template>
 

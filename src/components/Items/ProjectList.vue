@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div  id="projectList" >
     <div v-bind:key="project.id" v-for="project in projects">
         <Project v-bind:project="project" />
     </div>
@@ -18,4 +18,6 @@ export default {
 </script>
 
 <style scoped>
+#projectList{margin-left: 300px;
+    height: 100%;}
 </style>

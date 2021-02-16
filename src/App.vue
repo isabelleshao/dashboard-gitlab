@@ -1,7 +1,8 @@
 <template>
   <div>
     <Header />
-    <Search @new-search="logResult" />
+   
+    <Search @new-search="logResult" /> <Sidebar/>
     <ProjectList v-bind:projects="projects"/>
   </div>
 </template>
@@ -11,6 +12,7 @@ import Header from './components/TopPanel/Header';
 import ProjectList from './components/Items/ProjectList';
 import Search from './components/Search/Search';
 import axios from 'axios';
+import Sidebar from './components/TopPanel/Sidebar.vue';
 
 export default {
   name: 'app',
@@ -18,6 +20,7 @@ export default {
     Header,
     ProjectList,
     Search,
+    Sidebar,
   },
   data(){
     return {
@@ -52,7 +55,7 @@ export default {
 * {
     box-sizing: border-box;
     margin: 0;
-    padding: 0;
+    /*padding: 0;*/
   }
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -69,4 +72,7 @@ body {
 
   
 }
+
+
+
 </style>
