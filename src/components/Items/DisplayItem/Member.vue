@@ -33,12 +33,17 @@
 
 <style scoped>
 
+.Member{
+    float:left;
+}
+
 div.hrefWraper{
-    width:12.5%;
+    display: inline-block;
+    width: 100%;
     height:50%;
-    padding-bottom:1em;
     cursor: pointer;
-    
+    padding:0.25em;
+    margin-bottom: 0.1em;
 }
 
 div.hrefWraper:hover{
@@ -49,13 +54,12 @@ img {
   border-radius: 50%;
   width:25%;
   float:left;
-  margin-top:7px;
-  margin-left: 1em;
+  margin-top:0.25em;
 }
 p {
-    width: 10em;
-    padding-top:10px;
-    margin-left: 5em;
+    margin: auto;
+    padding: 0.5em;
+    display: inline-block;
 }
 
 a:visited {

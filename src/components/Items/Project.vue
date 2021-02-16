@@ -1,19 +1,30 @@
 <template>
   <div class="project">
-    <h3>{{project.name}}</h3>
-    <div v-bind:key="member.id" v-for="member in displayMember">
-        <Member v-bind:member=member />
-    </div>
-    <p>Last activity : {{project.last_activity_at}}</p>
-    <p>Tags : {{project.tag_list}}</p>
-    <p>Owner : {{project.owner}}</p>
-
-    <div v-bind:key="contributor.id" v-for="contributor in contributors">
-        <h4> Contributions </h4>
-        <h5>{{contributor}} </h5>
+    <div class = "projectName">
+        <div class = "hrefProjectwrap" @click="openProjectLink()">
+            <h3>{{project.name}}</h3>
+        </div>
     </div>
 
-    <p> pipelines : {{ pipelines}} </p>
+    <div class="members">
+        <div v-bind:key="member.id" v-for="member in displayMember">
+            <Member v-bind:member="member" />
+        </div>
+    </div>
+  
+    <div class = "projectDetails">
+        <p>Last activity : {{project.last_activity_at}}</p>
+        <p>Tags : {{project.tag_list}}</p>
+        <p>Owner : {{project.owner}}</p>
+
+        <div v-bind:key="contributor.id" v-for="contributor in contributors">
+            <h4> Contributions </h4>
+            <h5>{{contributor}} </h5>
+        </div>
+
+        <p> pipelines : {{ pipelines}} </p>
+    </div>
+  
     
 
   </div>
@@ -39,6 +50,12 @@
                 pipelines: [],
             }
         },
+        methods:{
+            openProjectLink(){
+                window.open(this.project.web_url,"_blank")
+            }
+        },
+
         created(){
 
             // Loads events of project (add members, commits, etc...)
@@ -185,6 +202,39 @@
 </script>
 
 <style scoped>
+
+    .project{
+        display: inline-block;
+        width: 100%;
+    }
+    .members{
+        margin-top:1em;
+    }
+
+    .projectDetails{
+        display: inline-block;
+        margin-top: 1em;
+    }
+
+    .projectName{
+        width: 100%;
+    }
+    .hrefProjectwrap{
+        margin-left:2em;
+        padding: 0.5em;
+        border-radius: 10px;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .hrefProjectwrap:hover{
+        background-color: rgba(202,202,202,0.64);
+        
+    }
+    h3{
+        margin: auto;
+        text-align: center;
+        font-size: 30px;
+    }
   .project {
     background: #f4f4f4;
     padding: 10px;
