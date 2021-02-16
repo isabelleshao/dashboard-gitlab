@@ -37,6 +37,7 @@
             }
         },
         created(){
+
             // Loads events of project (add members, commits, etc...)
             axios.get(this.project._links.events,{
             headers: {
@@ -153,7 +154,7 @@
                         console.error(error)
                         })
                         
-                        // Load pipeline details
+                        // Load pipeline test report
                         axios.get(this.project._links.self + "/pipelines/" + this.pipelines[pipelineIndex]['id'] + "/test_report",{
                         headers: {
                             'Access-Control-Allow-Origin': 'GET',
