@@ -1,21 +1,36 @@
 <template>
   <div class="project">
-    <h3>{{project.name}}</h3>
-    <div v-bind:key="member.id" v-for="member in displayMember">
-        <h5>{{member}} </h5>
-    </div>
+    <h3><a :href="project.web_url" target="_blank">{{project.name}}</a></h3>
+    <p>Etudiants : 
+        <ul><li v-bind:key="member.id" v-for="member in displayMember">
+
+
+       nom : {{member.name}}  ( <a :href="member.web_url" target="_blank"> {{member.id}}</a> ) 
+       </li></ul> </p>
+  
     <p>Last activity : {{project.last_activity_at}}</p>
-    <p>Tags : {{project.tag_list}}</p>
-    <p>Owner : {{project.owner}}</p>
+      <p>Tags : {{project.tag_list}}</p>
+   <!-- <p>Owner : {{project.owner}}</p>-->
+<p> Contributions : 
 
-    <div v-bind:key="contributor.id" v-for="contributor in contributors">
-        <h4> Contributions </h4>
-        <h5>{{contributor}} </h5>
-    </div>
+      <ul><li v-bind:key="contributor.id" v-for="contributor in contributors">
 
-    <p> pipelines : {{ pipelines}} </p>
-    
+       {{contributor.name}}     commits: {{contributor.commits}}  additions : {{contributor.additions}} deletions : {{contributor.deletions}}    </li></ul>
+    </p>
 
+  <p> pipelines ({{pipelines.length}}): 
+            <a :href="pipelines[0].web_url" target="_blank">{{pipelines[0].id}}</a>   {{pipelines[0].status}} {{pipelines[0].updated_at}} 
+            
+       
+      
+  <!--    
+      <ul><li v-bind:key="pipeline.id" v-for="pipeline in pipelines">
+         
+              <a :href="pipeline.web_url" target="_blank">{{pipeline.id}}</a>   {{pipeline.status}} {{pipeline.updated_at}} 
+             </li></ul> 
+            
+    -->
+ </p>
   </div>
 </template>
 
@@ -77,10 +92,11 @@
                 if(canAdd){
                     this.displayMember = [...this.displayMember, {
                         name:res.data[membIndex]['name'],
-                        avatar_url:res.data[membIndex]['avatar_url'],
+                        //avatar_url:res.data[membIndex]['avatar_url'],
                         id:res.data[membIndex]['id'],
-                        username:res.data[membIndex]['username'],
                         web_url:res.data[membIndex]['web_url'],
+                        username:res.data[membIndex]['username'],
+                        //web_url:res.data[membIndex]['web_url'],
                         }
                     ]
 
