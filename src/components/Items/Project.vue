@@ -221,23 +221,21 @@
     .projectName{
         width: 100%;
         display: inline-flex;
+        margin-bottom: 1em;
     }
     .hrefProjectwrap{
-        margin-left:2em;
         padding: 0.5em;
         border-radius: 10px;
         display: inline-flex;
         cursor: pointer;
+        text-align: center;
+        font-size: 30px;
     }
     .hrefProjectwrap:hover{
         background-color: rgba(202,202,202,0.64);
         
     }
-    h3{
-        margin: auto;
-        text-align: center;
-        font-size: 30px;
-    }
+
   .project {
     background: #f4f4f4;
     padding: 10px;
