@@ -1,8 +1,8 @@
 <template>
   <div class="project">
-    <div class = "projectName">
+    <div class = "projectDiv">
         <div class = "hrefProjectwrap" @click="openProjectLink()">
-            <h3>{{project.name}}</h3>
+            <h3 class = "projectName">{{project.name}}</h3>
         </div>
         <div class = "tagsContainer">
             
@@ -22,8 +22,29 @@
         </div>
     </div>
   
-    <div class = "projectDetails">
-        <p> pipelines : {{ pipelines}} </p>
+    <div class = "pipeline">
+        <div class="hrefPipelinewrap" @click="openPipelineLink(pipelines[0]['web_url'])">
+            <div class = "successDiv" v-if="pipelines[0]['status'] === 'success'">
+                <p class = "successp"> Lastest commit passed </p>
+                <img class = "successIcon" src='../../../public/success-icon-10.png' alt = "success image"/>
+            </div>
+            <div v-else-if="pipelines[0]['status']==='failed'" class = "failedDiv" >
+                <p class = "failedp"> Lastest commit failed </p>
+                <img class = "failedIcon" src='../../../public/remove.png' alt = "success image"/>
+            </div>
+        </div>
+
+        <div v-if="typeof pipelines[0]['jobs_summary'] != 'undefined'" class = "numberTestPassed">
+            <p class = "numberTestPassedp"> {{pipelines[0]['jobs_summary']['success_count']}} / {{pipelines[0]['jobs_summary']['total_count']}} </p>
+
+            <div v-bind:key="job.id" v-for="job in pipelines[0]['jobs']">
+                <p @click="openJobLink(job.web_url)" v-if="job.status == 'failed'" class = "jobFailed"> {{job.name}} </p>
+                <p @click="openJobLink(job.web_url)" v-if="job.status == 'skipped'" class = "jobSkipped"> {{job.name}} </p>
+            </div>
+        </div>
+        
+        
+
     </div>
   
     
@@ -32,6 +53,10 @@
 </template>
 
 <script>
+
+//          <div v-if="typeof pipelines[0]['summary'] != 'undefined'" class = "numberTestPassed">
+//             <p class = "numberTestPassedp"> {{pipelines[0]['summary']['success_count']}} / {{pipelines[0]['summary']['total_count']}} </p>
+//         </div>
     import Member from "./DisplayItem/Member"
     import axios from "axios";
 
@@ -47,7 +72,12 @@
                 displayMember: [],
                 members: [],
                 events: [],
-                pipelines: [],
+                // Initialized status a none so it can be read in the pipeline status fail or success html
+                pipelines: [
+                    {   status:"none",
+                        jobs:[],
+                    }
+                    ],
                 tags: [],
                 date: {},
             }
@@ -59,6 +89,12 @@
             openTagLink(link){
                 window.open(link,"_blank")
             },
+            openPipelineLink(link){
+                window.open(link,"_blank")
+            },
+            openJobLink(link){
+                window.open(link,"_blank")
+            }
         },
 
         created(){
@@ -127,7 +163,7 @@
                 if(res.data.length > 0){
                     this.pipelines = res.data
 
-                    for(var pipelineIndex in res.data){
+                    for(const pipelineIndex in res.data){
 
                         // Load pipeline details
                         axios.get(this.project._links.self + "/pipelines/" + this.pipelines[pipelineIndex]['id'],{
@@ -144,16 +180,34 @@
                         console.error(error)
                         })
                         
-                        // Load pipeline test report
-                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[pipelineIndex]['id'] + "/test_report",{
+                        // Load pipeline jobs
+                        
+                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[pipelineIndex]['id'] + "/jobs",{
                         headers: {
                             'Access-Control-Allow-Origin': 'GET',
                             'Content-Type': 'application/json',
                             "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
                         }
                         })
-                        .then((resSummary) => {
-                            this.$set(this.pipelines[pipelineIndex],"summary",resSummary.data)
+                        .then((resJob) => {
+                            if(this.project.id == 11){
+                                console.log(resJob)
+                                console.log(pipelineIndex)
+                                console.log(this.pipelines[pipelineIndex]['id'])
+                            }
+                            
+                            this.$set(this.pipelines[pipelineIndex],"jobs",resJob.data)
+
+                            var numberSuccess = 0
+                            var numberJobs = 0
+                            for(const i in resJob.data){
+                                if(resJob.data[i].status == "success"){
+                                    numberSuccess += 1
+                                }
+                                numberJobs += 1
+                            }
+
+                            this.$set(this.pipelines[pipelineIndex],"jobs_summary",{'success_count': numberSuccess, 'total_count': numberJobs})
                         })
                         .catch((error) => {
                         console.error(error)
@@ -174,6 +228,81 @@
 
 <style scoped>
 
+    .jobFailed{
+        margin-left: 1em;
+        background-color: rgba(233,19,19,0.8);
+        border-radius: 5px;
+        padding: 0.25em;
+        padding-left: 0.75em;
+        padding-right: 0.75em;
+        color: white;
+    }
+    .jobFailed:hover{
+        background-color: rgba(233,19,19,0.6);
+        cursor: pointer;
+    }
+
+    .jobSkipped{
+        margin-left: 1em;
+        background-color: rgba(105,105,105,0.84);
+        border-radius: 5px;
+        padding: 0.25em;
+        color: white;
+        padding-left: 0.75em;
+        padding-right: 0.75em;
+    }
+    .jobSkipped:hover{
+        background-color: rgba(105,105,105,0.54);
+        cursor: pointer;
+    }
+
+    .pipeline{
+        display: inline-flex;
+        width: 100%;
+    }
+
+    .hrefPipelinewrap{
+        margin-left:0.5em;
+        padding: 0.5em;
+    }
+    .hrefPipelinewrap:hover{
+        background-color: rgba(101,101,101,0.3);
+        border-radius: 5px;
+        cursor: pointer;
+        display: inline-block;
+        
+    }
+
+    .numberTestPassed{
+        text-align:center;
+        align-items: center;
+        margin-left: 1em;
+        display: inline-flex;
+    }
+
+    .successDiv{
+        display: inline-flex;   
+    }
+    .successp{
+        float: left;
+    }
+    .successIcon{
+        height: 20px;
+        float: left;
+        margin-left: 0.5em;
+    }
+
+    .failedDiv{
+        margin-left: 0.5em;
+        display: inline-flex;
+        text-align: center;
+    }
+
+    .failedIcon{
+        margin-left: 0.5em;
+        height: 20px;
+    }
+
     .tagsContainer{
         display: inline-table;
         width: 40%;
@@ -188,13 +317,20 @@
         border-radius: 5px;
         cursor: pointer;
     }
+    .tag:hover{
+        float: left;
+        margin: 0.5em;
+        padding: 0.25em;
+        font-size: 1em;
+        text-align: center;
+        background-color: rgba(101,101,101,0.3);
+        border-radius: 5px;
+        cursor: pointer;
+    }
 
     .project{
         display: inline-block;
         width: 100%;
-    }
-    .members{
-
     }
 
     .projectDetails{
@@ -210,6 +346,7 @@
     .datep{
         margin: auto;
         padding: auto;
+        margin-left: 0.5em;
     }
     .calendarIcon{
         margin-top: 1em;
@@ -218,10 +355,15 @@
         padding: auto;
     }
 
-    .projectName{
+    .projectDiv{
         width: 100%;
         display: inline-flex;
         margin-bottom: 1em;
+    }
+    .projectName{
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
     }
     .hrefProjectwrap{
         padding: 0.5em;

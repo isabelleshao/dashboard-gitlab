@@ -62,15 +62,5 @@ p {
     display: inline-block;
 }
 
-a:visited {
-}
-a {
-    text-decoration: none !important;
-    text-color: #000000;
-    color: black;
-    background: red;
-}
-
-
 
 </style>
