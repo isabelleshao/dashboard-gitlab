@@ -1,11 +1,15 @@
 <template>
 <div class = "pipeline">
         <div class="hrefPipelinewrap" @click="openPipelineLink(pipelines[0]['web_url'])">
+
+            
             <div class = "successDiv" v-if="pipelines[0]['status'] === 'success'">
+                <img class="commitimg" src='../../../../public/commit.png' alt="commit image" />
                 <p class = "successp"> Lastest commit passed </p>
                 <img class = "successIcon" src='../../../../public/success-icon-10.png' alt = "success image"/>
             </div>
             <div v-else-if="pipelines[0]['status']==='failed'" class = "failedDiv" >
+                <img class="commitimg" src='../../../../public/commit.png' alt="commit image" />
                 <p class = "failedp"> Lastest commit failed </p>
                 <img class = "failedIcon" src='../../../../public/remove.png' alt = "success image"/>
             </div>
@@ -120,6 +124,11 @@
 </script>
 
 <style scoped>
+
+.commitimg{
+    width:1.25em;
+    margin-right: 0.5em;
+}
 .numberTestPassed{
         text-align:center;
         align-items: center;
@@ -128,7 +137,8 @@
     }
 
 .successDiv{
-    display: inline-flex;   
+    display: inline-flex;
+    align-items: center;   
 }
 .successp{
     float: left;
@@ -143,6 +153,7 @@
     margin-left: 0.5em;
     display: inline-flex;
     text-align: center;
+    align-items: center;
 }
 
 .failedIcon{
@@ -158,6 +169,9 @@
 .hrefPipelinewrap{
     margin-left:0.5em;
     padding: 0.5em;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 0.25em;
 }
 .hrefPipelinewrap:hover{
     background-color: rgba(101,101,101,0.3);
