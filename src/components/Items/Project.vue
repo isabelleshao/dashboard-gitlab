@@ -4,6 +4,12 @@
         <div class = "hrefProjectwrap" @click="openProjectLink()">
             <h3>{{project.name}}</h3>
         </div>
+        <div class = "tagsContainer">
+            
+            <div v-bind:key="tag.id" v-for="tag in this.tags">
+                <p class = "tag" @click="openTagLink(tag.commit.web_url)">{{tag.name}}</p>
+            </div>
+        </div>
     </div>
     <div class = "date">
         <img class = "calendarIcon" src="../../../public//CalendarIcon.png" alt="Calendar image" />
@@ -11,21 +17,12 @@
     </div>
 
     <div class="members">
-        <div v-bind:key="member.id" v-for="member in displayMember">
+        <div v-bind:key="member.id" v-for="member in this.members">
             <Member v-bind:member="member" />
         </div>
     </div>
   
     <div class = "projectDetails">
-        
-        <p>Tags : {{project.tag_list}}</p>
-        <p>Owner : {{project.owner}}</p>
-
-        <div v-bind:key="contributor.id" v-for="contributor in contributors">
-            <h4> Contributions </h4>
-            <h5>{{contributor}} </h5>
-        </div>
-
         <p> pipelines : {{ pipelines}} </p>
     </div>
   
@@ -49,16 +46,19 @@
             return{
                 displayMember: [],
                 members: [],
-                contributors : [],
                 events: [],
                 pipelines: [],
+                tags: [],
                 date: {},
             }
         },
         methods:{
             openProjectLink(){
                 window.open(this.project.web_url,"_blank")
-            }
+            },
+            openTagLink(link){
+                window.open(link,"_blank")
+            },
         },
 
         created(){
@@ -66,7 +66,8 @@
             var dateTime = new Date(this.project.last_activity_at).toLocaleTimeString()
             this.$set(this.date,"dateDDMMYY",date)
             this.$set(this.date,"dateTime",dateTime)
-            console.log(this.date)
+            
+
             // Loads events of project (add members, commits, etc...)
             axios.get(this.project._links.events,{
             headers: {
@@ -77,6 +78,21 @@
             })
             .then((res) => {
             this.events = res.data
+            })
+            .catch((error) => {
+            console.error(error)
+            })
+
+            // Loads tags of project
+            axios.get(this.project._links.self + "/repository/tags",{
+            headers: {
+                'Access-Control-Allow-Origin': 'GET',
+                'Content-Type': 'application/json',
+                "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
+            }
+            })
+            .then((res) => {
+            this.tags = res.data
             })
             .catch((error) => {
             console.error(error)
@@ -94,60 +110,6 @@
             
             
             this.members = res.data
-            
-            // To create the list of names to display
-            for(var membIndex in res.data){
-                // Doesn't go in the if
-                var canAdd = true;
-                for(var nameIndex in this.displayMember){
-                    if(this.displayMember[nameIndex].name == res.data[membIndex]['name']){
-                        canAdd = false
-                    }
-                }
-                if(canAdd){
-                    this.displayMember = [...this.displayMember, {
-                        name:res.data[membIndex]['name'],
-                        avatar_url:res.data[membIndex]['avatar_url'],
-                        id:res.data[membIndex]['id'],
-                        username:res.data[membIndex]['username'],
-                        web_url:res.data[membIndex]['web_url'],
-                        }
-                    ]
-
-                    // Load user informations
-                    axios.get("https://pstl.algo-prog.info/api/v4/users/" + res.data[membIndex]['id'],{
-                    headers: {
-                        'Access-Control-Allow-Origin': 'GET',
-                        'Content-Type': 'application/json',
-                        "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
-                    }
-                    })
-                    .then((resUser) => {
-                        this.displayMember[this.displayMember.length-1]['email'] = resUser.data.email
-                        this.displayMember[this.displayMember.length-1]['avatar_url'] = resUser.data.avatar_url
-                    })
-                    .catch((error) => {
-                    console.error(error)
-                    })
-                }
-            }
-            
-            })
-            .catch((error) => {
-            console.error(error)
-            })
-
-            // Load contributors
-            axios.get(this.project._links.self + "/repository/contributors",{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
-            }
-            })
-            .then((res) => {
-            
-            this.contributors = res.data
             })
             .catch((error) => {
             console.error(error)
@@ -211,6 +173,21 @@
 </script>
 
 <style scoped>
+
+    .tagsContainer{
+        display: inline-table;
+        width: 40%;
+    }
+    .tag{
+        float: left;
+        margin: 0.5em;
+        padding: 0.25em;
+        font-size: 1em;
+        text-align: center;
+        background-color: rgba(202,202,202,0.64);
+        border-radius: 5px;
+        cursor: pointer;
+    }
 
     .project{
         display: inline-block;
