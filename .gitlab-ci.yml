@@ -1,0 +1,6 @@
+build site:
+  image: node:lastest
+  stage: build
+  script:
+    - npm install --progress=false
+    - npm run build
