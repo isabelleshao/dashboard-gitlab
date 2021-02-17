@@ -1,42 +1,70 @@
 <template>
   <div class="project">
-    <h3>{{project.name}}</h3>
-    <div v-bind:key="member.id" v-for="member in displayMember">
-        <h5>{{member}} </h5>
-    </div>
-    <p>Last activity : {{project.last_activity_at}}</p>
-    <p>Tags : {{project.tag_list}}</p>
-    <p>Owner : {{project.owner}}</p>
-
-    <div v-bind:key="contributor.id" v-for="contributor in contributors">
-        <h4> Contributions </h4>
-        <h5>{{contributor}} </h5>
+    <div class = "projectDiv">
+        <div class = "hrefProjectwrap" @click="openProjectLink()">
+            <h3 class = "projectName">{{project.name}}</h3>
+        </div>
+        <Tags v-bind:project="this.project" />
     </div>
 
-    <p> pipelines : {{ pipelines}} </p>
+    <div class = "date">
+        <img class = "calendarIcon" src="../../../public//CalendarIcon.png" alt="Calendar image" />
+        <p class = "datep">Last activity : {{this.date.dateDDMMYY}} at {{this.date.dateTime}}</p>
+    </div>
+
+    <Members v-bind:project="this.project" />
     
-
+    
+    <Pipeline v-bind:project="this.project"/>
   </div>
 </template>
 
-<script>
 
+<script>
+    import Members from "./ProjectItems/Members"
+    import Pipeline from "./ProjectItems/Pipeline"
+    import Tags from "./ProjectItems/Tags"
     import axios from "axios";
 
     export default {
         name: "Project",
+        components:{
+            Members,
+            Pipeline,
+            Tags,
+        },
         props: ["project"],
 
         data(){
             return{
                 displayMember: [],
                 members: [],
-                contributors : [],
                 events: [],
-                pipelines: [],
+                tags: [],
+                date: {},
             }
         },
+        methods:{
+            openProjectLink(){
+                window.open(this.project.web_url,"_blank")
+            },
+            openTagLink(link){
+                window.open(link,"_blank")
+            },
+            openPipelineLink(link){
+                window.open(link,"_blank")
+            },
+            openJobLink(link){
+                window.open(link,"_blank")
+            }
+        },
+
         created(){
+            var date = new Date(this.project.last_activity_at).toLocaleDateString();
+            var dateTime = new Date(this.project.last_activity_at).toLocaleTimeString()
+            this.$set(this.date,"dateDDMMYY",date)
+            this.$set(this.date,"dateTime",dateTime)
+            
 
             // Loads events of project (add members, commits, etc...)
             axios.get(this.project._links.events,{
@@ -65,125 +93,66 @@
             
             
             this.members = res.data
-            
-            // To create the list of names to display
-            for(var membIndex in res.data){
-                // Doesn't go in the if
-                var canAdd = true;
-                for(var nameIndex in this.displayMember){
-                    if(this.displayMember[nameIndex].name == res.data[membIndex]['name']){
-                        canAdd = false
-                    }
-                }
-                if(canAdd){
-                    this.displayMember = [...this.displayMember, {
-                        name:res.data[membIndex]['name'],
-                        avatar_url:res.data[membIndex]['avatar_url'],
-                        id:res.data[membIndex]['id'],
-                        username:res.data[membIndex]['username'],
-                        web_url:res.data[membIndex]['web_url'],
-                        }
-                    ]
-
-                    // Load user informations
-                    axios.get("https://pstl.algo-prog.info/api/v4/users/" + res.data[membIndex]['id'],{
-                    headers: {
-                        'Access-Control-Allow-Origin': 'GET',
-                        'Content-Type': 'application/json',
-                        "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
-                    }
-                    })
-                    .then((resUser) => {
-                        this.displayMember[this.displayMember.length-1]['email'] = resUser.data.email
-                        this.displayMember[this.displayMember.length-1]['avatar_url'] = resUser.data.avatar_url
-                    })
-                    .catch((error) => {
-                    console.error(error)
-                    })
-                }
-            }
-            
             })
             .catch((error) => {
             console.error(error)
             })
-
-            // Load contributors
-            axios.get(this.project._links.self + "/repository/contributors",{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
-            }
-            })
-            .then((res) => {
-            
-            this.contributors = res.data
-            })
-            .catch((error) => {
-            console.error(error)
-            })
-
-            // Load pipelines
-            axios.get(this.project._links.self + "/pipelines",{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
-            }
-            })
-            .then((res) => {
-                if(res.data.length > 0){
-                    this.pipelines = res.data
-
-                    for(var pipelineIndex in res.data){
-
-                        // Load pipeline details
-                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[pipelineIndex]['id'],{
-                        headers: {
-                            'Access-Control-Allow-Origin': 'GET',
-                            'Content-Type': 'application/json',
-                            "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
-                        }
-                        })
-                        .then((resDetail) => {
-                            this.$set(this.pipelines[pipelineIndex],"details",resDetail.data)
-                            console.log(this.pipelines[pipelineIndex])
-                        })
-                        .catch((error) => {
-                        console.error(error)
-                        })
-                        
-                        // Load pipeline test report
-                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[pipelineIndex]['id'] + "/test_report",{
-                        headers: {
-                            'Access-Control-Allow-Origin': 'GET',
-                            'Content-Type': 'application/json',
-                            "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
-                        }
-                        })
-                        .then((resSummary) => {
-                            this.$set(this.pipelines[pipelineIndex],"summary",resSummary.data)
-                            console.log(this.pipelines[pipelineIndex])
-                        })
-                        .catch((error) => {
-                        console.error(error)
-                        })
-
-                    }
-                }
-            })
-            .catch((error) => {
-            console.error(error)
-            })
-
-            
-            
         },
     }
 </script>
 
 <style scoped>
+
+    .project{
+        display: inline-block;
+        width: 100%;
+    }
+
+    .projectDetails{
+        display: inline-block;
+        margin-top: 1em;
+    }
+
+    .date{
+        margin-left:0.5em;
+        display: inline-flex;
+    }
+
+    .datep{
+        margin: auto;
+        padding: auto;
+        margin-left: 0.5em;
+    }
+    .calendarIcon{
+        margin-top: 1em;
+        width: 2em;
+        margin: auto;
+        padding: auto;
+    }
+
+    .projectDiv{
+        width: 100%;
+        display: inline-flex;
+        margin-bottom: 1em;
+    }
+    .projectName{
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+    }
+    .hrefProjectwrap{
+        padding: 0.5em;
+        border-radius: 10px;
+        display: inline-flex;
+        cursor: pointer;
+        text-align: center;
+        font-size: 30px;
+    }
+    .hrefProjectwrap:hover{
+        background-color: rgba(202,202,202,0.64);
+        
+    }
+
   .project {
     background: #f4f4f4;
     padding: 10px;
