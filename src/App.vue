@@ -1,15 +1,18 @@
 <template>
   <div>
     <Header />
-    <Search @new-search="logResult" />
-    <ProjectList v-bind:projects="projects"/>
+
+    <div class = "flexContainer">
+      <FilterPanel />
+      <ProjectList v-bind:projects="projects"/>
+    </div>
   </div>
 </template>
 
 <script>
 import Header from './components/TopPanel/Header';
 import ProjectList from './components/Items/ProjectList';
-import Search from './components/Search/Search';
+import FilterPanel from './components/FilterPanel/FilterPanel';
 import axios from 'axios';
 
 export default {
@@ -17,7 +20,7 @@ export default {
   components: {
     Header,
     ProjectList,
-    Search,
+    FilterPanel,
   },
   data(){
     return {
@@ -59,7 +62,13 @@ body {
   line-height: 1.4;
 }
 
+.flexContainer {
+  display: flex;
+}
+
 #app {
+
+
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

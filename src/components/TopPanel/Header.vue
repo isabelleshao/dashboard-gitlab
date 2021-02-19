@@ -12,6 +12,9 @@ export default{
 
 <style scoped>
     .header {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0px;
         background: #333;
         color: #fff;
         text-align: center;
