@@ -17,7 +17,7 @@
 import axios from "axios";
 export default {
   name: "SearchQuery",
- // props: ["projects"],
+  props: ["token"],
   data() {
     return {
       title:'',
@@ -36,7 +36,7 @@ export default {
             headers: {
               "Access-Control-Allow-Origin": "GET",
               "Content-Type": "application/json",
-              "PRIVATE-TOKEN": "SszFftmYGbwKHfoXWEzj",
+              "PRIVATE-TOKEN": this.$props.token,
             },
           }
         )

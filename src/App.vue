@@ -3,7 +3,7 @@
     <Header />
 
     <div class="flexContainer">
-      <FilterPanel @new-search="addSearch" />
+      <FilterPanel @new-search="addSearch" v-bind:token="this.token"/>
       <ProjectList v-bind:projects="projects" v-bind:token="this.token"/>
     </div>
   </div>

@@ -2,18 +2,19 @@
   <div class="header">
     <div class="sticky">
       <h1>Filters</h1>
-      <Search @new-search="addSearch" />
+      <Search @new-search="addSearch" v-bind:token="this.token"/>
     </div>
   </div>
 </template>
 
 <script>
-import Search from "../Search/Search.vue";
+import Search from "./Search/Search.vue";
 export default {
   name: "FilterPanel",
     components: {
-    Search,
-  },
+      Search,
+    },
+    props: ["token"],
     data() {
     return {
       projects : null
