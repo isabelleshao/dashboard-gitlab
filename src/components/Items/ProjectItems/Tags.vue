@@ -13,7 +13,7 @@
         name: "Tags",
         components:{
         },
-        props: ["project"],
+        props: ["project","token"],
 
         data(){
             return{
@@ -28,11 +28,12 @@
 
         created(){
             // Loads tags of project
+            console.log(this.$props.token)
             axios.get(this.project._links.self + "/repository/tags",{
             headers: {
                 'Access-Control-Allow-Origin': 'GET',
                 'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
+                "PRIVATE-TOKEN" : this.$props.token
             }
             })
             .then((res) => {

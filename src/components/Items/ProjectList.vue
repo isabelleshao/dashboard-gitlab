@@ -1,7 +1,7 @@
 <template>
   <div class = "listProject">
     <div v-bind:key="project.id" v-for="project in projects">
-        <Project v-bind:project="project" />
+        <Project v-bind:project="project" v-bind:token="token"/>
     </div>
   </div>
 </template>
@@ -13,7 +13,7 @@ export default {
   components: {
     Project
   },
-  props: ["projects"]
+  props: ["projects","token"]
 }
 </script>
 

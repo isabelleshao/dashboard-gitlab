@@ -33,7 +33,7 @@
         name: "Pipeline",
         components:{
         },
-        props: ["project"],
+        props: ["project","token"],
 
         data(){
             return{
@@ -59,7 +59,7 @@
             headers: {
                 'Access-Control-Allow-Origin': 'GET',
                 'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
+                "PRIVATE-TOKEN" : this.$props.token
             }
             })
             .then((res) => {
@@ -73,7 +73,7 @@
                         headers: {
                             'Access-Control-Allow-Origin': 'GET',
                             'Content-Type': 'application/json',
-                            "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
+                            "PRIVATE-TOKEN" : this.$props.token
                         }
                         })
                         .then((resDetail) => {
@@ -89,7 +89,7 @@
                         headers: {
                             'Access-Control-Allow-Origin': 'GET',
                             'Content-Type': 'application/json',
-                            "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
+                            "PRIVATE-TOKEN" : this.$props.token
                         }
                         })
                         .then((resJob) => {

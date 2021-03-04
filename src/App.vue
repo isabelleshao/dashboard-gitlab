@@ -4,7 +4,7 @@
 
     <div class="flexContainer">
       <FilterPanel @new-search="addSearch" />
-      <ProjectList v-bind:projects="projects" />
+      <ProjectList v-bind:projects="projects" v-bind:token="this.token"/>
     </div>
   </div>
 </template>
@@ -13,6 +13,7 @@
 import Header from "./components/TopPanel/Header";
 import ProjectList from "./components/Items/ProjectList";
 import FilterPanel from "./components/FilterPanel/FilterPanel";
+import token from "../token.json"
 import axios from "axios";
 
 export default {
@@ -26,7 +27,8 @@ export default {
     return {
       projects: [],
       search: [],
-      projects2:[]
+      projects2:[],
+      token:token.token,
 
     };
   },
@@ -36,7 +38,7 @@ export default {
         headers: {
           "Access-Control-Allow-Origin": "GET",
           "Content-Type": "application/json",
-          "PRIVATE-TOKEN": "SszFftmYGbwKHfoXWEzj",
+          "PRIVATE-TOKEN": this.token,
         },
       })
       .then((res) => {
