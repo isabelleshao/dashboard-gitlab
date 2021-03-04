@@ -16,7 +16,7 @@
         components:{
             Member,
         },
-        props: ["project"],
+        props: ["project","token"],
 
         data(){
             return{
@@ -32,7 +32,7 @@
             headers: {
                 'Access-Control-Allow-Origin': 'GET',
                 'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
+                "PRIVATE-TOKEN" : this.$props.token
             }
             })
             .then((res) => {

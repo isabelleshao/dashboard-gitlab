@@ -4,7 +4,7 @@
         <div class = "hrefProjectwrap" @click="openProjectLink()">
             <h3 class = "projectName">{{project.name}}</h3>
         </div>
-        <Tags v-bind:project="this.project" />
+        <Tags v-bind:project="this.project" v-bind:token="token"/>
     </div>
 
     <div class = "date">
@@ -12,10 +12,10 @@
         <p class = "datep">Last activity : {{this.date.dateDDMMYY}} at {{this.date.dateTime}}</p>
     </div>
 
-    <Members v-bind:project="this.project" />
+    <Members v-bind:project="this.project" v-bind:token="token"/>
     
     
-    <Pipeline v-bind:project="this.project"/>
+    <Pipeline v-bind:project="this.project" v-bind:token="token"/>
   </div>
 </template>
 
@@ -33,7 +33,7 @@
             Pipeline,
             Tags,
         },
-        props: ["project"],
+        props: ["project","token"],
 
         data(){
             return{
@@ -71,7 +71,7 @@
             headers: {
                 'Access-Control-Allow-Origin': 'GET',
                 'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
+                "PRIVATE-TOKEN" : this.$props.token,
             }
             })
             .then((res) => {
@@ -81,22 +81,7 @@
             console.error(error)
             })
 
-            // Load members of project
-            axios.get(this.project._links.members,{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
-            }
-            })
-            .then((res) => {
             
-            
-            this.members = res.data
-            })
-            .catch((error) => {
-            console.error(error)
-            })
         },
     }
 </script>
