@@ -4,6 +4,7 @@ node_modules
 
 # Token file
 token.json
+/bkp
 
 # local env files
 .env.local

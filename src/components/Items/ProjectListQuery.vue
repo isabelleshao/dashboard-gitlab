@@ -1,0 +1,24 @@
+<template>
+  <div class = "listProject">
+    <div v-bind:key="project.id" v-for="project in projects">
+        <Project v-bind:project="project" v-bind:token="token"/>
+    </div>
+  </div>
+</template>
+
+<script>
+import Project from './Project.vue';
+export default {
+  name: "ProjectListQuery",
+  components: {
+    Project
+  },
+  props: ["projects","token"]
+}
+</script>
+
+<style scoped>
+.listProject{
+  width:80vw;
+}
+</style>

@@ -28,7 +28,6 @@
 
         created(){
             // Loads tags of project
-            console.log(this.$props.token)
             axios.get(this.project._links.self + "/repository/tags",{
             headers: {
                 'Access-Control-Allow-Origin': 'GET',

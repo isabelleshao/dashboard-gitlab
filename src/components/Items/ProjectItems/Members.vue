@@ -36,9 +36,10 @@
             }
             })
             .then((res) => {
-            
-            
-            this.members = res.data
+                this.members = res.data
+                if(this.members.length > 0){
+                    this.$emit("loadedMembers", this.members)
+                }
             })
             .catch((error) => {
             console.error(error)
