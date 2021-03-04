@@ -3,6 +3,7 @@
     <div class="sticky">
       <h1>Filters</h1>
       <Search @new-search="addSearch" v-bind:token="this.token"/>
+      <button v-on:click="resetsearch"> Reset </button>
     </div>
   </div>
 </template>
@@ -25,6 +26,9 @@ export default {
       this.projects = s;
       this.$emit("new-search", s);
     },
+    resetsearch(){
+      this.$emit("resetsearch")
+    }
   },
 };
 </script>

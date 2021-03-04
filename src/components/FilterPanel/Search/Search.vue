@@ -1,12 +1,12 @@
 <template>
   <div>
     <form @submit.prevent="newSearch">
-      <input
-        type="text"
-        v-model="title"
-        name="title"
-        placeholder="Project Name..."
-      />
+      <input type="text" v-model="title" name="title" placeholder="Project Name..." /><br />
+      <input type="text" v-model="user"  name="user" placeholder="User Name..."/><br />
+      <input type="text" v-model="tag"  name="tag" placeholder="Tag Name..."/><br />
+      <!--<input type="text" v-model="group" name="group" placeholder="Group Name..." /><br>
+    
+      <input type="text" v-model="tag" name="tag" placeholder="Tag Name..." /><br>-->
       <input type="submit" value="Submit" class="btn" />
     </form>
   </div>
@@ -14,64 +14,51 @@
 
 <script>
 // import uuid from 'uuid';
-import axios from "axios";
+//import axios from "axios";
 export default {
   name: "SearchQuery",
-  props: ["token"],
+  // props: ["projects"],
   data() {
     return {
-      title:'',
-    projects: [],
+      user: "",
+      title: "",
+      tag: "",
+      projects: [],
     };
   },
 
   methods: {
-    newSearch() {
 
-      axios
-        .get(
-          "https://pstl.algo-prog.info/api/v4/search?scope=projects&search=" +
-            this.title,
-          {
-            headers: {
-              "Access-Control-Allow-Origin": "GET",
-              "Content-Type": "application/json",
-              "PRIVATE-TOKEN": this.$props.token,
-            },
-          }
-        )
-        .then((res) => {
-         
-          this.projects = res.data;
-          this.$emit("new-search", this.projects);
-       this.title = '';
- 
-        })
-        .catch((error) => {
-          console.error(error);
-        })
-  ;
 
-    },
+createQuery(){
+  if (this.title.length>0){
+    return  "https://pstl.algo-prog.info/api/v4/search?scope=projects&search=" +this.title
+  }
 
-    /* 
-
+    if (this.user.length>0){
+    return  "https://pstl.algo-prog.info/api/v4/search?scope=projects&search=" +this.title
+  }
+},
     newSearch() {
       const searchRequest = {
         name: "project-name",
         title: this.title,
+        user : this.user,
+        tag : this.tag,
       }
       // Send up to parent
       this.$emit('new-search', searchRequest);
       this.title = '';
-    } */
+      this.user = '';
+      this.tag = '';
+    } 
   },
 };
 </script>
 
 <style scoped>
 form {
-  display: flex;
+  /*display: flex;*/
 }
 input[type="text"] {
   flex: 10;
