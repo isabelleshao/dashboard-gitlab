@@ -4,8 +4,8 @@
 
     <div class="flexContainer">
       <FilterPanel @new-search="addSearch2" @resetsearch="resetsearch" v-bind:token="this.token"/>
-      <ProjectListQuery v-bind:projects="projectsQuery" v-bind:token="this.token" v-if="isLoaded" />
-      <ProjectList v-bind:projects="projects" v-bind:token="this.token" v-else />
+      <ProjectListQuery v-bind:projects="projectsQuery" v-bind:gitlaburl="this.gitlaburl" v-bind:token="this.token" v-if="isLoaded" />
+      <ProjectList v-bind:projects="projects" v-bind:gitlaburl="this.gitlaburl" v-bind:token="this.token" v-else />
     </div>
   </div>
 </template>
@@ -33,12 +33,12 @@ export default {
       filterIn: [],
       projectsQuery:[],
       token:token.token,
-
+      gitlaburl: "https://pstl.algo-prog.info/api/v4",
     };
   },
   created() {
     axios
-      .get("https://pstl.algo-prog.info/api/v4/projects", {
+      .get(this.gitlaburl + "/projects", {
         headers: {
           "Access-Control-Allow-Origin": "GET",
           "Content-Type": "application/json",

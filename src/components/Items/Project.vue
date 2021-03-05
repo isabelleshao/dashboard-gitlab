@@ -33,7 +33,7 @@
             Pipeline,
             Tags,
         },
-        props: ["project","token"],
+        props: ["project","token","gitlaburl"],
 
         data(){
             return{
