@@ -33,12 +33,12 @@ export default {
       filterIn: [],
       projectsQuery:[],
       token:token.token,
-
+      gitlaburl: "https://pstl.algo-prog.info/api/v4",
     };
   },
   created() {
     axios
-      .get("https://pstl.algo-prog.info/api/v4/projects", {
+      .get(this.gitlaburl + "/projects", {
         headers: {
           "Access-Control-Allow-Origin": "GET",
           "Content-Type": "application/json",
