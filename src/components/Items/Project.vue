@@ -4,7 +4,7 @@
         <div class = "hrefProjectwrap" @click="openProjectLink()">
             <h3 class = "projectName">{{project.name}}</h3>
         </div>
-        <Tags v-bind:project="this.project" v-bind:token="token"/>
+        <Tags v-bind:project="this.project" v-bind:token="token" @loadedTags="loadTagsProject"/>
     </div>
 
     <div class = "date">
@@ -60,6 +60,9 @@
 
             loadMembersProject(members){
                 this.$emit("loadedMembersProject", this.project.id, members)
+            },
+            loadTagsProject(tags){
+                this.$emit("loadedTagsProject", this.project.id, tags)
             }
         },
 
