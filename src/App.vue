@@ -10,6 +10,7 @@
         v-bind:token="this.token" 
         @loadedMembersProjectList="loadMembersApp"
         @loadedTagsProjectList="loadTagsApp" 
+        @loadedPipelinesProjectList="loadPipelinesApp" 
         v-else/>
     </div>
   </div>
@@ -71,6 +72,13 @@ export default {
       for(const proj of this.projects){
         if(proj.id == id){
           proj.tags = tags
+        }
+      }
+    },
+    loadPipelinesApp(id, pipelines){
+      for(const proj of this.projects){
+        if(proj.id == id){
+          proj.pipelines = pipelines
         }
       }
     },

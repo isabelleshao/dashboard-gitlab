@@ -15,7 +15,7 @@
     <Members  v-bind:project="this.project" v-bind:token="token" @loadedMembers="loadMembersProject" />
     
     
-    <Pipeline v-bind:project="this.project" v-bind:token="token"/>
+    <Pipeline v-bind:project="this.project" v-bind:token="token" @loadedPipelines="loadPipelinesProject"/>
   </div>
 </template>
 
@@ -24,7 +24,6 @@
     import Members from "./ProjectItems/Members"
     import Pipeline from "./ProjectItems/Pipeline"
     import Tags from "./ProjectItems/Tags"
-    import axios from "axios";
 
     export default {
         name: "Project",
@@ -63,7 +62,10 @@
             },
             loadTagsProject(tags){
                 this.$emit("loadedTagsProject", this.project.id, tags)
-            }
+            },
+            loadPipelinesProject(pipelines){
+                this.$emit("loadedPipelinesProject", this.project.id, pipelines)
+            },
         },
 
         created(){
@@ -71,24 +73,6 @@
             var dateTime = new Date(this.project.last_activity_at).toLocaleTimeString()
             this.$set(this.date,"dateDDMMYY",date)
             this.$set(this.date,"dateTime",dateTime)
-            
-
-            // Loads events of project (add members, commits, etc...)
-            axios.get(this.project._links.events,{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : this.$props.token,
-            }
-            })
-            .then((res) => {
-            this.events = res.data
-            })
-            .catch((error) => {
-            console.error(error)
-            })
-
-            
         },
     }
 </script>

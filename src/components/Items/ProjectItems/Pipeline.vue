@@ -55,21 +55,23 @@
 
         created(){
             // Load pipelines
-            axios.get(this.project._links.self + "/pipelines",{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : this.$props.token
+
+            if(this.project.pipelines){
+                this.pipelines = this.project.pipelines
             }
-            })
-            .then((res) => {
-                if(res.data.length > 0){
-                    this.pipelines = res.data
-
-                    for(const pipelineIndex in res.data){
-
+            else{
+                axios.get(this.project._links.self + "/pipelines",{
+                headers: {
+                    'Access-Control-Allow-Origin': 'GET',
+                    'Content-Type': 'application/json',
+                    "PRIVATE-TOKEN" : this.$props.token
+                }
+                })
+                .then((res) => {
+                    if(res.data.length > 0){
+                        this.pipelines = res.data
                         // Load pipeline details
-                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[pipelineIndex]['id'],{
+                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[0]['id'],{
                         headers: {
                             'Access-Control-Allow-Origin': 'GET',
                             'Content-Type': 'application/json',
@@ -77,7 +79,7 @@
                         }
                         })
                         .then((resDetail) => {
-                            this.$set(this.pipelines[pipelineIndex],"details",resDetail.data)
+                            this.$set(this.pipelines[0],"details",resDetail.data)
                         })
                         .catch((error) => {
                         console.error(error)
@@ -85,7 +87,7 @@
                         
                         // Load pipeline jobs
                         
-                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[pipelineIndex]['id'] + "/jobs",{
+                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[0]['id'] + "/jobs",{
                         headers: {
                             'Access-Control-Allow-Origin': 'GET',
                             'Content-Type': 'application/json',
@@ -93,7 +95,7 @@
                         }
                         })
                         .then((resJob) => {
-                            this.$set(this.pipelines[pipelineIndex],"jobs",resJob.data)
+                            this.$set(this.pipelines[0],"jobs",resJob.data)
 
                             var numberSuccess = 0
                             var numberJobs = 0
@@ -104,20 +106,20 @@
                                 numberJobs += 1
                             }
 
-                            this.$set(this.pipelines[pipelineIndex],"jobs_summary",{'success_count': numberSuccess, 'total_count': numberJobs})
+                            this.$set(this.pipelines[0],"jobs_summary",{'success_count': numberSuccess, 'total_count': numberJobs})
+
+                            this.$emit("loadedPipelines",this.pipelines)
                         })
                         .catch((error) => {
                         console.error(error)
                         })
 
                     }
-                }
-            })
-            .catch((error) => {
-            console.error(error)
-            })
-
-            
+                })
+                .catch((error) => {
+                console.error(error)
+                })
+            }
             
         },
     }

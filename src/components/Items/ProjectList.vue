@@ -1,7 +1,10 @@
 <template>
   <div class = "listProject">
     <div v-bind:key="project.id" v-for="project in projects">
-        <Project v-bind:project="project" v-bind:token="token" @loadedMembersProject="loadMembersProjectList" @loadedTagsProject="loadTagsProjectList"/>
+        <Project v-bind:project="project" v-bind:token="token" 
+          @loadedMembersProject="loadMembersProjectList" 
+          @loadedTagsProject="loadTagsProjectList"
+          @loadedPipelinesProject="loadPipelinesProjectList"/>
     </div>
   </div>
 </template>
@@ -20,6 +23,9 @@ export default {
       },
       loadTagsProjectList(id,tags){
           this.$emit("loadedTagsProjectList",id,tags)
+      },
+      loadPipelinesProjectList(id,pipelines){
+          this.$emit("loadedPipelinesProjectList",id,pipelines)
       },
     },
 }
