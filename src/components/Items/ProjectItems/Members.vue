@@ -27,23 +27,26 @@
         },
 
         created(){
-            // Load members of project
-            axios.get(this.project._links.members,{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : this.$props.token
+            if(this.project.members){
+                this.members = this.project.members
             }
-            })
-            .then((res) => {
-                this.members = res.data
-                if(this.members.length > 0){
-                    this.$emit("loadedMembers", this.members)
+            else{
+                // Load members of project
+                axios.get(this.project._links.members,{
+                headers: {
+                    'Access-Control-Allow-Origin': 'GET',
+                    'Content-Type': 'application/json',
+                    "PRIVATE-TOKEN" : this.$props.token
                 }
-            })
-            .catch((error) => {
-            console.error(error)
-            })
+                })
+                .then((res) => {
+                    this.members = res.data
+                    this.$emit("loadedMembers", this.members)
+                })
+                .catch((error) => {
+                console.error(error)
+                })
+            }
         },
     }
 </script>

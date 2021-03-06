@@ -12,7 +12,7 @@
         <p class = "datep">Last activity : {{this.date.dateDDMMYY}} at {{this.date.dateTime}}</p>
     </div>
 
-    <Members v-bind:project="this.project" v-bind:token="token" @loadedMembers="loadMembers" />
+    <Members  v-bind:project="this.project" v-bind:token="token" @loadedMembers="loadMembersProject" />
     
     
     <Pipeline v-bind:project="this.project" v-bind:token="token"/>
@@ -58,8 +58,8 @@
                 window.open(link,"_blank")
             },
 
-            loadMembers(members){
-                this.members = members
+            loadMembersProject(members){
+                this.$emit("loadedMembersProject", this.project.id, members)
             }
         },
 
