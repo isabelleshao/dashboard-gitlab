@@ -66,51 +66,47 @@
                 if(res.data.length > 0){
                     this.pipelines = res.data
 
-                    for(const pipelineIndex in res.data){
-
-                        // Load pipeline details
-                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[pipelineIndex]['id'],{
-                        headers: {
-                            'Access-Control-Allow-Origin': 'GET',
-                            'Content-Type': 'application/json',
-                            "PRIVATE-TOKEN" : this.$props.token
-                        }
-                        })
-                        .then((resDetail) => {
-                            this.$set(this.pipelines[pipelineIndex],"details",resDetail.data)
-                        })
-                        .catch((error) => {
-                        console.error(error)
-                        })
-                        
-                        // Load pipeline jobs
-                        
-                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[pipelineIndex]['id'] + "/jobs",{
-                        headers: {
-                            'Access-Control-Allow-Origin': 'GET',
-                            'Content-Type': 'application/json',
-                            "PRIVATE-TOKEN" : this.$props.token
-                        }
-                        })
-                        .then((resJob) => {
-                            this.$set(this.pipelines[pipelineIndex],"jobs",resJob.data)
-
-                            var numberSuccess = 0
-                            var numberJobs = 0
-                            for(const i in resJob.data){
-                                if(resJob.data[i].status == "success"){
-                                    numberSuccess += 1
-                                }
-                                numberJobs += 1
-                            }
-
-                            this.$set(this.pipelines[pipelineIndex],"jobs_summary",{'success_count': numberSuccess, 'total_count': numberJobs})
-                        })
-                        .catch((error) => {
-                        console.error(error)
-                        })
-
+                    // Load pipeline details
+                    axios.get(this.project._links.self + "/pipelines/" + this.pipelines[0]['id'],{
+                    headers: {
+                        'Access-Control-Allow-Origin': 'GET',
+                        'Content-Type': 'application/json',
+                        "PRIVATE-TOKEN" : this.$props.token
                     }
+                    })
+                    .then((resDetail) => {
+                        this.$set(this.pipelines[0],"details",resDetail.data)
+                    })
+                    .catch((error) => {
+                    console.error(error)
+                    })
+                    
+                    // Load pipeline jobs
+                    
+                    axios.get(this.project._links.self + "/pipelines/" + this.pipelines[0]['id'] + "/jobs",{
+                    headers: {
+                        'Access-Control-Allow-Origin': 'GET',
+                        'Content-Type': 'application/json',
+                        "PRIVATE-TOKEN" : this.$props.token
+                    }
+                    })
+                    .then((resJob) => {
+                        this.$set(this.pipelines[0],"jobs",resJob.data)
+
+                        var numberSuccess = 0
+                        var numberJobs = 0
+                        for(const i in resJob.data){
+                            if(resJob.data[i].status == "success"){
+                                numberSuccess += 1
+                            }
+                            numberJobs += 1
+                        }
+
+                        this.$set(this.pipelines[0],"jobs_summary",{'success_count': numberSuccess, 'total_count': numberJobs})
+                    })
+                    .catch((error) => {
+                    console.error(error)
+                    })
                 }
             })
             .catch((error) => {
