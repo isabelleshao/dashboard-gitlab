@@ -1,8 +1,6 @@
 <template>
-<div class = "pipeline">
+<div class = "pipeline" v-if="pipelines.length > 0">
         <div class="hrefPipelinewrap" @click="openPipelineLink(pipelines[0]['web_url'])">
-
-            
             <div class = "successDiv" v-if="pipelines[0]['status'] === 'success'">
                 <img class="commitimg" src='../../../../public/commit.png' alt="commit image" />
                 <p class = "successp"> Lastest commit passed </p>
@@ -38,9 +36,6 @@
         data(){
             return{
                 pipelines: [
-                    {   status:"none",
-                        jobs:[],
-                    }
                 ],
             }
         },
@@ -55,65 +50,73 @@
 
         created(){
             // Load pipelines
-            axios.get(this.project._links.self + "/pipelines",{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : this.$props.token
+            if(this.project.pipelines){
+                this.pipelines = this.project.pipelines
             }
-            })
-            .then((res) => {
-                if(res.data.length > 0){
-                    this.pipelines = res.data
-
-                    // Load pipeline details
-                    axios.get(this.project._links.self + "/pipelines/" + this.pipelines[0]['id'],{
-                    headers: {
-                        'Access-Control-Allow-Origin': 'GET',
-                        'Content-Type': 'application/json',
-                        "PRIVATE-TOKEN" : this.$props.token
-                    }
-                    })
-                    .then((resDetail) => {
-                        this.$set(this.pipelines[0],"details",resDetail.data)
-                    })
-                    .catch((error) => {
-                    console.error(error)
-                    })
-                    
-                    // Load pipeline jobs
-                    
-                    axios.get(this.project._links.self + "/pipelines/" + this.pipelines[0]['id'] + "/jobs",{
-                    headers: {
-                        'Access-Control-Allow-Origin': 'GET',
-                        'Content-Type': 'application/json',
-                        "PRIVATE-TOKEN" : this.$props.token
-                    }
-                    })
-                    .then((resJob) => {
-                        this.$set(this.pipelines[0],"jobs",resJob.data)
-
-                        var numberSuccess = 0
-                        var numberJobs = 0
-                        for(const i in resJob.data){
-                            if(resJob.data[i].status == "success"){
-                                numberSuccess += 1
-                            }
-                            numberJobs += 1
-                        }
-
-                        this.$set(this.pipelines[0],"jobs_summary",{'success_count': numberSuccess, 'total_count': numberJobs})
-                    })
-                    .catch((error) => {
-                    console.error(error)
-                    })
+            else{
+                axios.get(this.project._links.self + "/pipelines",{
+                headers: {
+                    'Access-Control-Allow-Origin': 'GET',
+                    'Content-Type': 'application/json',
+                    "PRIVATE-TOKEN" : this.$props.token
                 }
-            })
-            .catch((error) => {
-            console.error(error)
-            })
+                })
+                .then((res) => {
+                    if(res.data.length > 0){
+                        this.pipelines = res.data
+                        // Load pipeline details
+                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[0]['id'],{
+                        headers: {
+                            'Access-Control-Allow-Origin': 'GET',
+                            'Content-Type': 'application/json',
+                            "PRIVATE-TOKEN" : this.$props.token
+                        }
+                        })
+                        .then((resDetail) => {
+                            this.$set(this.pipelines[0],"details",resDetail.data)
+                        })
+                        .catch((error) => {
+                        console.error(error)
+                        })
+                        
+                        // Load pipeline jobs
+                        
+                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[0]['id'] + "/jobs",{
+                        headers: {
+                            'Access-Control-Allow-Origin': 'GET',
+                            'Content-Type': 'application/json',
+                            "PRIVATE-TOKEN" : this.$props.token
+                        }
+                        })
+                        .then((resJob) => {
+                            this.$set(this.pipelines[0],"jobs",resJob.data)
 
-            
+                            var numberSuccess = 0
+                            var numberJobs = 0
+                            for(const i in resJob.data){
+                                if(resJob.data[i].status == "success"){
+                                    numberSuccess += 1
+                                }
+                                numberJobs += 1
+                            }
+                            
+                            this.$set(this.pipelines[0],"jobs_summary",{'success_count': numberSuccess, 'total_count': numberJobs})
+                            this.$emit("loadedPipelines",this.pipelines)
+                            console.log(this.pipelines)
+                        })
+                        .catch((error) => {
+                        console.error(error)
+                        })
+
+                    }
+                    else{
+                        this.$emit("loadedPipelines",[])
+                    }
+                })
+                .catch((error) => {
+                console.error(error)
+                })
+            }
             
         },
     }

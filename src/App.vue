@@ -5,7 +5,13 @@
     <div class="flexContainer">
       <FilterPanel @new-search="addSearch2" @resetsearch="resetsearch" v-bind:token="this.token"/>
       <ProjectListQuery v-bind:projects="projectsQuery" v-bind:token="this.token" v-if="isLoaded" />
-      <ProjectList v-bind:projects="projects" v-bind:token="this.token" v-else />
+      <ProjectList 
+        v-bind:projects="projects" 
+        v-bind:token="this.token" 
+        @loadedMembersProjectList="loadMembersApp"
+        @loadedTagsProjectList="loadTagsApp" 
+        @loadedPipelinesProjectList="loadPipelinesApp" 
+        v-else/>
     </div>
   </div>
 </template>
@@ -54,6 +60,29 @@ export default {
       });
   },
   methods: {
+
+    loadMembersApp(id, members){
+      for(const proj of this.projects){
+        if(proj.id == id){
+          proj.members = members
+        }
+      }
+    },
+    loadTagsApp(id, tags){
+      for(const proj of this.projects){
+        if(proj.id == id){
+          proj.tags = tags
+        }
+      }
+    },
+    loadPipelinesApp(id, pipelines){
+      for(const proj of this.projects){
+        if(proj.id == id){
+          proj.pipelines = pipelines
+        }
+      }
+    },
+
     addSearch(s) {
       this.filterIn = [];
 
