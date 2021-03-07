@@ -69,6 +69,7 @@
         },
 
         created(){
+            console.log(this.project)
             var date = new Date(this.project.last_activity_at).toLocaleDateString();
             var dateTime = new Date(this.project.last_activity_at).toLocaleTimeString()
             this.$set(this.date,"dateDDMMYY",date)

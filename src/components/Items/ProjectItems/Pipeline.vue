@@ -1,5 +1,5 @@
 <template>
-<div class = "pipeline" v-if="pipelines.length > 0">
+    <div class = "pipeline" v-if="pipelines.length > 0">
         <div class="hrefPipelinewrap" @click="openPipelineLink(pipelines[0]['web_url'])">
             <div class = "successDiv" v-if="pipelines[0]['status'] === 'success'">
                 <img class="commitimg" src='../../../../public/commit.png' alt="commit image" />
@@ -20,7 +20,7 @@
                 <p @click="openJobLink(job.web_url)" v-if="job.status == 'skipped'" class = "jobSkipped"> {{job.name}} </p>
             </div>
         </div>
-</div>
+    </div>
 </template>
 
 
@@ -102,7 +102,6 @@
                             
                             this.$set(this.pipelines[0],"jobs_summary",{'success_count': numberSuccess, 'total_count': numberJobs})
                             this.$emit("loadedPipelines",this.pipelines)
-                            console.log(this.pipelines)
                         })
                         .catch((error) => {
                         console.error(error)
