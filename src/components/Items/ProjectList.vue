@@ -28,6 +28,9 @@ export default {
           this.$emit("loadedPipelinesProjectList",id,pipelines)
       },
     },
+  created(){
+    console.log(this.projects)
+  }
 }
 </script>
 

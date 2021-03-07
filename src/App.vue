@@ -43,21 +43,57 @@ export default {
     };
   },
   created() {
+    // Number of project per page
+    var per_page = 20
+
     axios
-      .get(this.gitlaburl + "/projects", {
+      .get(this.gitlaburl + "/projects", {        
         headers: {
           "Access-Control-Allow-Origin": "GET",
           "Content-Type": "application/json",
           "PRIVATE-TOKEN": this.token,
         },
+        params: {
+          page: 1,
+          per_page: per_page
+        }
       })
       .then((res) => {
         this.projects = res.data;
         this.projectsQuery = res.data;
+
+        
+        var totalPages = res.headers["x-total-pages"];
+        var i;
+        
+
+        for(i = 2; i<totalPages; i++){
+          axios
+          .get(this.gitlaburl + "/projects", {        
+            headers: {
+              "Access-Control-Allow-Origin": "GET",
+              "Content-Type": "application/json",
+              "PRIVATE-TOKEN": this.token,
+            },
+            params: {
+              page: i,
+              per_page: per_page
+            }
+          })
+          .then((resNextProj) => {
+              for(var j = 0; j < resNextProj.data.length; j++){
+                this.projects.push(resNextProj.data[j])
+              }
+            })
+          .catch((error) => {
+            console.error(error);
+          });
+        }
+        
       })
       .catch((error) => {
         console.error(error);
-      });
+      })
   },
   methods: {
 
