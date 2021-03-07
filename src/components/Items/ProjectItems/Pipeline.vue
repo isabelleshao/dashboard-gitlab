@@ -1,8 +1,6 @@
 <template>
-<div class = "pipeline">
+    <div class = "pipeline" v-if="pipelines.length > 0">
         <div class="hrefPipelinewrap" @click="openPipelineLink(pipelines[0]['web_url'])">
-
-            
             <div class = "successDiv" v-if="pipelines[0]['status'] === 'success'">
                 <img class="commitimg" src='../../../../public/commit.png' alt="commit image" />
                 <p class = "successp"> Lastest commit passed </p>
@@ -22,7 +20,7 @@
                 <p @click="openJobLink(job.web_url)" v-if="job.status == 'skipped'" class = "jobSkipped"> {{job.name}} </p>
             </div>
         </div>
-</div>
+    </div>
 </template>
 
 
@@ -33,14 +31,11 @@
         name: "Pipeline",
         components:{
         },
-        props: ["project"],
+        props: ["project","token"],
 
         data(){
             return{
                 pipelines: [
-                    {   status:"none",
-                        jobs:[],
-                    }
                 ],
             }
         },
@@ -55,29 +50,30 @@
 
         created(){
             // Load pipelines
-            axios.get(this.project._links.self + "/pipelines",{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
+            if(this.project.pipelines){
+                this.pipelines = this.project.pipelines
             }
-            })
-            .then((res) => {
-                if(res.data.length > 0){
-                    this.pipelines = res.data
-
-                    for(const pipelineIndex in res.data){
-
+            else{
+                axios.get(this.project._links.self + "/pipelines",{
+                headers: {
+                    'Access-Control-Allow-Origin': 'GET',
+                    'Content-Type': 'application/json',
+                    "PRIVATE-TOKEN" : this.$props.token
+                }
+                })
+                .then((res) => {
+                    if(res.data.length > 0){
+                        this.pipelines = res.data
                         // Load pipeline details
-                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[pipelineIndex]['id'],{
+                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[0]['id'],{
                         headers: {
                             'Access-Control-Allow-Origin': 'GET',
                             'Content-Type': 'application/json',
-                            "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
+                            "PRIVATE-TOKEN" : this.$props.token
                         }
                         })
                         .then((resDetail) => {
-                            this.$set(this.pipelines[pipelineIndex],"details",resDetail.data)
+                            this.$set(this.pipelines[0],"details",resDetail.data)
                         })
                         .catch((error) => {
                         console.error(error)
@@ -85,15 +81,15 @@
                         
                         // Load pipeline jobs
                         
-                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[pipelineIndex]['id'] + "/jobs",{
+                        axios.get(this.project._links.self + "/pipelines/" + this.pipelines[0]['id'] + "/jobs",{
                         headers: {
                             'Access-Control-Allow-Origin': 'GET',
                             'Content-Type': 'application/json',
-                            "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
+                            "PRIVATE-TOKEN" : this.$props.token
                         }
                         })
                         .then((resJob) => {
-                            this.$set(this.pipelines[pipelineIndex],"jobs",resJob.data)
+                            this.$set(this.pipelines[0],"jobs",resJob.data)
 
                             var numberSuccess = 0
                             var numberJobs = 0
@@ -103,21 +99,23 @@
                                 }
                                 numberJobs += 1
                             }
-
-                            this.$set(this.pipelines[pipelineIndex],"jobs_summary",{'success_count': numberSuccess, 'total_count': numberJobs})
+                            
+                            this.$set(this.pipelines[0],"jobs_summary",{'success_count': numberSuccess, 'total_count': numberJobs})
+                            this.$emit("loadedPipelines",this.pipelines)
                         })
                         .catch((error) => {
                         console.error(error)
                         })
 
                     }
-                }
-            })
-            .catch((error) => {
-            console.error(error)
-            })
-
-            
+                    else{
+                        this.$emit("loadedPipelines",[])
+                    }
+                })
+                .catch((error) => {
+                console.error(error)
+                })
+            }
             
         },
     }

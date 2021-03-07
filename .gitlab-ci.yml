@@ -3,4 +3,3 @@ build site:
   stage: build
   script:
     - npm install --progress=false
-    - npm run build

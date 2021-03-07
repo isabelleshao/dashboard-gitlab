@@ -13,7 +13,7 @@
         name: "Tags",
         components:{
         },
-        props: ["project"],
+        props: ["project","token"],
 
         data(){
             return{
@@ -28,19 +28,26 @@
 
         created(){
             // Loads tags of project
-            axios.get(this.project._links.self + "/repository/tags",{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
+
+            if(this.project.tags){
+                this.tags = this.project.tags
             }
-            })
-            .then((res) => {
-            this.tags = res.data
-            })
-            .catch((error) => {
-            console.error(error)
-            })
+            else{
+                axios.get(this.project._links.self + "/repository/tags",{
+                headers: {
+                    'Access-Control-Allow-Origin': 'GET',
+                    'Content-Type': 'application/json',
+                    "PRIVATE-TOKEN" : this.$props.token
+                }
+                })
+                .then((res) => {
+                this.tags = res.data
+                this.$emit("loadedTags",this.tags)
+                })
+                .catch((error) => {
+                console.error(error)
+                })
+            }
 
         },
     }

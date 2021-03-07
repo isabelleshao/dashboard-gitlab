@@ -16,7 +16,7 @@
         components:{
             Member,
         },
-        props: ["project"],
+        props: ["project","token"],
 
         data(){
             return{
@@ -27,22 +27,26 @@
         },
 
         created(){
-            // Load members of project
-            axios.get(this.project._links.members,{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : "SszFftmYGbwKHfoXWEzj"
+            if(this.project.members){
+                this.members = this.project.members
             }
-            })
-            .then((res) => {
-            
-            
-            this.members = res.data
-            })
-            .catch((error) => {
-            console.error(error)
-            })
+            else{
+                // Load members of project
+                axios.get(this.project._links.members,{
+                headers: {
+                    'Access-Control-Allow-Origin': 'GET',
+                    'Content-Type': 'application/json',
+                    "PRIVATE-TOKEN" : this.$props.token
+                }
+                })
+                .then((res) => {
+                    this.members = res.data
+                    this.$emit("loadedMembers", this.members)
+                })
+                .catch((error) => {
+                console.error(error)
+                })
+            }
         },
     }
 </script>

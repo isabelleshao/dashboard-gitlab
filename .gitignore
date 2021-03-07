@@ -2,6 +2,9 @@
 node_modules
 /dist
 
+# Token file
+token.json
+/bkp
 
 # local env files
 .env.local
