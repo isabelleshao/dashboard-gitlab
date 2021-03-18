@@ -28,7 +28,6 @@
 
         created(){
             // Loads tags of project
-
             if(this.project.tags){
                 this.tags = this.project.tags
             }
