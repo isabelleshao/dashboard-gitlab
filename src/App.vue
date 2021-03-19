@@ -4,14 +4,17 @@
 
     <div class="flexContainer">
       <FilterPanel @new-search="addSearch2" @resetsearch="resetsearch" v-bind:token="this.token"/>
-      <ProjectListQuery v-bind:projects="projectsQuery" v-bind:token="this.token" v-if="isLoaded" />
+      
+      <GroupSelection v-bind:gitlaburl="this.gitlaburl" v-bind:token="this.token" v-if="GroupIsNotSelected" @addGroupSearch="addGroupSearch"/>
+
+      <ProjectListQuery v-bind:projects="projectsQuery" v-bind:token="this.token" v-if="isLoaded & !GroupIsNotSelected"/>
       <ProjectList 
         v-bind:projects="projects" 
         v-bind:token="this.token" 
         @loadedMembersProjectList="loadMembersApp"
         @loadedTagsProjectList="loadTagsApp" 
         @loadedPipelinesProjectList="loadPipelinesApp" 
-        v-else/>
+        v-else-if="!GroupIsNotSelected"/>
     </div>
   </div>
 </template>
@@ -21,6 +24,7 @@ import Header from "./components/TopPanel/Header";
 import ProjectList from "./components/Items/ProjectList";
 import ProjectListQuery from "./components/Items/ProjectListQuery";
 import FilterPanel from "./components/FilterPanel/FilterPanel";
+import GroupSelection from "./components/GroupSelection/GroupSelection";
 import token from "../token.json"
 import axios from "axios";
 
@@ -31,10 +35,12 @@ export default {
     ProjectList,
     FilterPanel,
     ProjectListQuery,
+    GroupSelection,
   },
   data() {
     return {
       isLoaded: false,
+      GroupIsNotSelected: true,
       projects: [],
       filterIn: [],
       projectsQuery:[],
@@ -43,6 +49,8 @@ export default {
     };
   },
   created() {
+
+    /*
     // Number of project per page
     var per_page = 20
 
@@ -94,6 +102,7 @@ export default {
       .catch((error) => {
         console.error(error);
       })
+      */
   },
   methods: {
 
@@ -119,19 +128,7 @@ export default {
       }
     },
 
-    addSearch(s) {
-      this.filterIn = [];
-
-      for (var i = 0; i < s.length; i++) {
-        for (var j = 0; j < this.projects2.length; j++) {
-          if (s[i].id == this.projects2[j].id) {
-            this.filterIn.push(this.projects2[j]);
-          }
-        }
-      }
-
-      this.projects = this.filterIn;
-    },
+    
 
     resetsearch() {
       this.isLoaded = false
@@ -168,6 +165,150 @@ export default {
         this.filterIn = this.getProjectByName(s.title);
       }
       this.projects = this.getProjectByName(s.title); */
+    },
+
+    async addGroupSearch(group){
+      const response = await this.getProjectByGroup(group);
+      const groupProjects = response.data.projects
+      var projectsToDisplay = []
+
+      for(const proj of groupProjects){
+        console.log(proj.web_url)
+        axios.get(this.gitlaburl + "/projects/" + proj.id + "/forks", {        
+          headers: {
+            "Access-Control-Allow-Origin": "GET",
+            "Content-Type": "application/json",
+            "PRIVATE-TOKEN": this.token,
+          },
+          params: {
+            page: 1,
+            per_page: 100
+          }
+        })
+        .then((res) => {
+          for(var k = 0; k < res.data.length; k++){
+            projectsToDisplay.push(res.data[k])
+          }
+          var totalPages = res.headers["x-total-pages"];
+          var i;
+
+          console.log(res)
+          
+          for(i = 2; i<=totalPages; i++){
+            axios
+            .get(this.gitlaburl + "/projects/" + proj.id + "/forks", {        
+              headers: {
+                "Access-Control-Allow-Origin": "GET",
+                "Content-Type": "application/json",
+                "PRIVATE-TOKEN": this.token,
+              },
+              params: {
+                page: i,
+                per_page: 100
+              }
+            })
+            .then((resNextProj) => {
+                for(var j = 0; j < resNextProj.data.length; j++){
+                  projectsToDisplay.push(resNextProj.data[j])
+                }
+                this.projects = projectsToDisplay
+                this.projectsQuery = projectsToDisplay
+              })
+            .catch((error) => {
+              console.error(error);
+            });
+          }
+          this.projects = projectsToDisplay
+          this.projectsQuery = projectsToDisplay
+          })
+          .catch((error) => {
+            console.error(error);
+          })
+
+          this.GroupIsNotSelected = false;
+          this.isLoaded = true;
+      }
+
+
+      
+
+      /*
+      axios.get(proj + "/projects", {        
+        headers: {
+          "Access-Control-Allow-Origin": "GET",
+          "Content-Type": "application/json",
+          "PRIVATE-TOKEN": this.token,
+        },
+        params: {
+          page: 1,
+          per_page: 100
+        }
+      })
+      .then((res) => {
+        this.projects = res.data;
+        this.projectsQuery = res.data;
+
+        
+        var totalPages = res.headers["x-total-pages"];
+        var i;
+        
+
+        for(i = 2; i<totalPages; i++){
+          axios
+          .get(this.gitlaburl + "/projects", {        
+            headers: {
+              "Access-Control-Allow-Origin": "GET",
+              "Content-Type": "application/json",
+              "PRIVATE-TOKEN": this.token,
+            },
+            params: {
+              page: i,
+              per_page: per_page
+            }
+          })
+          .then((resNextProj) => {
+              for(var j = 0; j < resNextProj.data.length; j++){
+                this.projects.push(resNextProj.data[j])
+              }
+            })
+          .catch((error) => {
+            console.error(error);
+          });
+        }
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+      */
+    },
+
+    addSearch(s) {
+      this.filterIn = [];
+
+      for (var i = 0; i < s.length; i++) {
+        for (var j = 0; j < this.projects2.length; j++) {
+          if (s[i].id == this.projects2[j].id) {
+            this.filterIn.push(this.projects2[j]);
+          }
+        }
+      }
+
+      this.projects = this.filterIn;
+    },
+
+    getProjectByGroup(group){
+      return axios
+      .get(this.gitlaburl + "/groups/" + group.id,{
+            headers: {
+                'Access-Control-Allow-Origin': 'GET',
+                'Content-Type': 'application/json',
+                "PRIVATE-TOKEN" : this.token
+            }
+      })
+    },
+
+    getProjectByForkedFrom(proj){
+      console.log(proj);
     },
 
     getProjectByName(strName) {
