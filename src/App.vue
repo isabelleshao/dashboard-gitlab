@@ -171,9 +171,9 @@ export default {
       const response = await this.getProjectByGroup(group);
       const groupProjects = response.data.projects
       var projectsToDisplay = []
+      var per_page = 20
 
       for(const proj of groupProjects){
-        console.log(proj.web_url)
         axios.get(this.gitlaburl + "/projects/" + proj.id + "/forks", {        
           headers: {
             "Access-Control-Allow-Origin": "GET",
@@ -182,7 +182,7 @@ export default {
           },
           params: {
             page: 1,
-            per_page: 100
+            per_page: per_page
           }
         })
         .then((res) => {
@@ -192,7 +192,6 @@ export default {
           var totalPages = res.headers["x-total-pages"];
           var i;
 
-          console.log(res)
           
           for(i = 2; i<=totalPages; i++){
             axios
@@ -204,7 +203,7 @@ export default {
               },
               params: {
                 page: i,
-                per_page: 100
+                per_page: per_page
               }
             })
             .then((resNextProj) => {
@@ -306,11 +305,6 @@ export default {
             }
       })
     },
-
-    getProjectByForkedFrom(proj){
-      console.log(proj);
-    },
-
     getProjectByName(strName) {
       // retourne liste des projets matchant avec le nom du projet
       var temp = [];
