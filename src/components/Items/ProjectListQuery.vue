@@ -19,6 +19,7 @@ export default {
       indexAt: 0,
       max_projects_display: 10,
       projectsDisplay: [],
+      filtered: false,
     }
   },
 
@@ -31,25 +32,42 @@ export default {
 
   watch: { 
     projects: async function(newVal) { // watch it
-        if(this.indexAt < this.max_projects_display){  
-          this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + this.max_projects_display))
-          this.indexAt = this.indexAt + this.max_projects_display + 1
+        if(this.filtered){
+          this.projectsDisplay = newVal
+        }
+        else{
+          if(this.indexAt < this.max_projects_display){  
+            var projectToAdd = this.max_projects_display
+            if(newVal.length < this.indexAt + projectToAdd){
+              projectToAdd = newVal.length - this.indexAt
+            }
+
+            this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
+            this.indexAt = this.indexAt + projectToAdd + 1
+          }
         }
     }
   },
 
   methods: {
       handleScroll: function(target) {
-        this.target = target;
+        if(!this.filtered){
+          this.target = target;
 
-        if ((window.innerHeight + window.scrollY)>= document.body.offsetHeight - 100) {
-            this.addProjects()
+          if ((window.innerHeight + window.scrollY)>= document.body.offsetHeight - 50) {
+              this.addProjects()
+          }
         }
       },
 
       addProjects(){
-          this.projectsDisplay = this.projectsDisplay.concat(this.projects.slice(this.indexAt, this.indexAt + this.max_projects_display))
-          this.indexAt = this.indexAt + this.max_projects_display + 1
+          var projectToAdd = this.max_projects_display
+          if(this.projects.length < this.indexAt + projectToAdd){
+            projectToAdd = this.projects.length - this.indexAt
+          }
+
+          this.projectsDisplay = this.projectsDisplay.concat(this.projects.slice(this.indexAt, this.indexAt + projectToAdd))
+          this.indexAt = this.indexAt + projectToAdd + 1
       }
     }
 }
