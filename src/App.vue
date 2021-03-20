@@ -43,66 +43,44 @@ export default {
       GroupIsNotSelected: true,
       projects: [],
       filterIn: [],
+      
       projectsQuery:[],
       token:token.token,
       gitlaburl: "https://pstl.algo-prog.info/api/v4",
+
+      filterTitle: [],
+
     };
   },
   created() {
+  },
 
-    /*
-    // Number of project per page
-    var per_page = 20
+  watch:{
+    projects: function(newVal) {
 
-    axios
-      .get(this.gitlaburl + "/projects", {        
-        headers: {
-          "Access-Control-Allow-Origin": "GET",
-          "Content-Type": "application/json",
-          "PRIVATE-TOKEN": this.token,
-        },
-        params: {
-          page: 1,
-          per_page: per_page
-        }
-      })
-      .then((res) => {
-        this.projects = res.data;
-        this.projectsQuery = res.data;
-
-        
-        var totalPages = res.headers["x-total-pages"];
-        var i;
-        
-
-        for(i = 2; i<totalPages; i++){
-          axios
-          .get(this.gitlaburl + "/projects", {        
-            headers: {
-              "Access-Control-Allow-Origin": "GET",
-              "Content-Type": "application/json",
-              "PRIVATE-TOKEN": this.token,
-            },
-            params: {
-              page: i,
-              per_page: per_page
-            }
-          })
-          .then((resNextProj) => {
-              for(var j = 0; j < resNextProj.data.length; j++){
-                this.projects.push(resNextProj.data[j])
+      var projectTitleToDisplay = []
+      console.log(this.filterTitle)
+      if(this.filterTitle.length > 0){
+          for(var proj of newVal){
+            var toAdd = true
+            for(var strName of this.filterTitle){
+              if (strName.length > 0) {
+                  if(!proj.name.toLowerCase().includes(strName.toLowerCase())){
+                    toAdd = false
+                  }
               }
-            })
-          .catch((error) => {
-            console.error(error);
-          });
-        }
-        
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      */
+            }
+            if(toAdd){
+              projectTitleToDisplay.push(proj)
+            }
+          }
+      }
+      else{
+        projectTitleToDisplay = newVal
+      }  
+
+      this.projectsQuery = projectTitleToDisplay
+    }  
   },
   methods: {
 
@@ -131,11 +109,17 @@ export default {
     
 
     resetsearch() {
+      this.filterTitle = []
       this.isLoaded = false
       this.projectsQuery = this.projects
     },
 
     async addSearch2(s) {
+
+      if(s.name == "project-name"){
+        this.filterTitle.push(s.title)
+      }
+
       if(s.title.length > 0){
         this.projectsQuery = this.getProjectByName(s.title)
         this.isLoaded = true
@@ -171,7 +155,7 @@ export default {
       const response = await this.getProjectByGroup(group);
       const groupProjects = response.data.projects
       var projectsToDisplay = []
-      var per_page = 20
+      var per_page = 150
 
       for(const proj of groupProjects){
         axios.get(this.gitlaburl + "/projects/" + proj.id + "/forks", {        
@@ -211,14 +195,12 @@ export default {
                   projectsToDisplay.push(resNextProj.data[j])
                 }
                 this.projects = projectsToDisplay
-                this.projectsQuery = projectsToDisplay
               })
             .catch((error) => {
               console.error(error);
             });
           }
           this.projects = projectsToDisplay
-          this.projectsQuery = projectsToDisplay
           })
           .catch((error) => {
             console.error(error);
