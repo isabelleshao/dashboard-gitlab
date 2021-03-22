@@ -127,6 +127,8 @@ export default {
       if(s.user.length > 0){
         this.projectsQuery = await this.getProjectByUser(s.user)
         this.isLoaded = true
+
+        
       }
       if(s.tag.length > 0){
         this.projectsQuery = await this.getProjectByTag(s.tag)
@@ -335,6 +337,8 @@ export default {
 
         }
         var projectbyusers = indexToKeep.map(j => this.projectsQuery[j]);
+
+        console.log(projectbyusers)
         return projectbyusers
     },
 
