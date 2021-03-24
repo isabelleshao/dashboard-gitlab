@@ -1,5 +1,7 @@
 <template>
   <div class="project">
+      <div class="cols">
+      <div class="col1">
     <div class = "projectDiv">
         <div class = "hrefProjectwrap" @click="openProjectLink()">
             <h3 class = "projectName">{{project.name}}</h3>
@@ -16,6 +18,9 @@
     
     
     <Pipeline v-bind:project="this.project" v-bind:token="token" @loadedPipelines="loadPipelinesProject"/>
+      </div><div class="col2">
+        <Comments  v-bind:comments="comments" /></div>
+  </div>
   </div>
 </template>
 
@@ -24,15 +29,16 @@
     import Members from "./ProjectItems/Members"
     import Pipeline from "./ProjectItems/Pipeline"
     import Tags from "./ProjectItems/Tags"
-
+    import Comments from "./ProjectItems/Comments"
     export default {
         name: "Project",
         components:{
             Members,
             Pipeline,
             Tags,
+            Comments
         },
-        props: ["project","token"],
+        props: ["project","token", "comments"],
 
         data(){
             return{
@@ -41,6 +47,7 @@
                 events: [],
                 tags: [],
                 date: {},
+               
             }
         },
         methods:{
@@ -79,6 +86,18 @@
 
 <style scoped>
 
+
+
+.cols {
+  display: flex;
+}
+
+.col1{
+           width: -webkit-fill-available;
+}
+.col2{
+     margin-left: auto;
+}
     .project{
         display: inline-block;
         width: 100%;

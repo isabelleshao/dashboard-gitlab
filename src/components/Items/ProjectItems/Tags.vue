@@ -54,8 +54,7 @@
 
 <style scoped>
 .tagsContainer{
-        display: inline-table;
-        width: 40%;
+        display: contents;
     }
 .tag{
     float: left;

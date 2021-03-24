@@ -7,7 +7,7 @@
       
       <GroupSelection v-bind:gitlaburl="this.gitlaburl" v-bind:token="this.token" v-if="GroupIsNotSelected" @addGroupSearch="addGroupSearch"/>
 
-      <ProjectListQuery v-bind:projects="projectsQuery" v-bind:token="this.token" v-if="isLoaded & !GroupIsNotSelected"/>
+      <ProjectListQuery v-bind:projects="projectsQuery" v-bind:token="this.token"  v-bind:comments="comments" v-if="isLoaded & !GroupIsNotSelected"/>
       <ProjectList 
         v-bind:projects="projects" 
         v-bind:token="this.token" 
@@ -49,10 +49,12 @@ export default {
       gitlaburl: "https://pstl.algo-prog.info/api/v4",
 
       filterTitle: [],
+      comments :[]
 
     };
   },
   created() {
+    this.recupererNotes();
   },
 
   watch:{
@@ -83,6 +85,46 @@ export default {
     }  
   },
   methods: {
+
+    recupererNotes(){
+
+
+        /*      axios.get(this.gitlaburl + "/user/", {        
+          headers: {
+            "Access-Control-Allow-Origin": "GET",
+            "Content-Type": "application/json",
+            "PRIVATE-TOKEN": this.token,
+          },
+        })
+
+*/  axios.get("https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/notes.json/raw?ref=master", {        
+          headers: {
+             "Access-Control-Allow-Origin": "GET",
+            "Content-Type": "application/json",
+            "PRIVATE-TOKEN": this.token,
+          },
+        })
+
+
+
+        .then((res) => {
+
+//var lienNotes = (res.data.web_url).concat("/notes"); 
+
+
+console.log(res.data)
+this.comments = res.data;
+
+
+        })
+
+          .catch((error) => {
+            console.error(error);
+          })
+  
+
+
+    },
 
     loadMembersApp(id, members){
       for(const proj of this.projects){
@@ -200,7 +242,8 @@ export default {
               console.error(error);
             });
           }
-          this.projects = projectsToDisplay
+          this.projects = projectsToDisplay;
+          console.log(this.projets)
           })
           .catch((error) => {
             console.error(error);
@@ -208,6 +251,7 @@ export default {
 
           this.GroupIsNotSelected = false;
           this.isLoaded = true;
+  
       }
 
 

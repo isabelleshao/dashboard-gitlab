@@ -1,7 +1,7 @@
 <template>
   <div class = "listProject" v-on:scroll="handleScroll">
     <div v-bind:key="project.id" v-for="project in projectsDisplay">
-        <Project v-bind:project="project" v-bind:token="token" 
+        <Project v-bind:project="project" v-bind:token="token"  v-bind:comments="comments" 
           @loadedMembersProject="loadMembersProjectList" 
           @loadedTagsProject="loadTagsProjectList"
           @loadedPipelinesProject="loadPipelinesProjectList"/>
@@ -11,12 +11,13 @@
 
 <script>
 import Project from './Project.vue';
+
 export default {
   name: "ProjectListQuery",
   components: {
     Project
   },
-  props: ["projects","token"],
+  props: ["projects","token", "comments"],
   data(){
     return{
       indexAt: 0,
@@ -81,6 +82,7 @@ export default {
       loadPipelinesProjectList(id,pipelines){
           this.$emit("loadedPipelinesProjectList",id,pipelines)
       },
+ 
     }
 }
 </script>
