@@ -82,8 +82,35 @@ export default {
       this.Comments[0].note1 = value;
       this.updatedNotes = this.Comments;
 
+      var postD = {
+        branch: 'master',
+        content: 'LUL',
+        commit_message: 'updatefile',
+      };
+
+      let axiosConfig = {
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          "Access-Control-Allow-Origin": "*",
+          "PRIVATE-TOKEN": this.$props.token,
+        },
+      };
+
       axios
-        .put(
+        .post(
+          "https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/blublu.json",
+          postD,
+          axiosConfig
+        )
+        .then((res) => {
+          console.log("RESPONSE RECEIVED: ", res);
+        })
+        .catch((err) => {
+          console.log("AXIOS ERROR: ", err);
+        });
+
+      /*   axios
+      .put(
           "https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/README.md",    {
             branch: "master",   content: " LUL",  commit_message: "update file"},
             {headers: 
@@ -95,14 +122,15 @@ export default {
         })
         .catch((error) => {
           console.log(error);
-        });
+        });*/
 
       /*     const url =
-        "https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/README.md";
+        "https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/blublu.md";
       const config = {
         headers: {
           "Content-Type": "application/json",
           "PRIVATE-TOKEN": this.$props.token,
+          "Access-Control-Allow-Origin": "POST",
         },
       };
       const content = {
@@ -111,10 +139,9 @@ export default {
         "commit_message": "update file",
       };
 
-      axios.put(url, content, config).then((response) => {
+      axios.post(url, content, config).then((response) => {
         console.log(response.data);
       });
-
 */
     },
   },
