@@ -16,7 +16,7 @@ export default {
   components: {
     Project
   },
-  props: ["projects","token"],
+  props: ["projects","token","reset"],
   data(){
     return{
       indexAt: 0,
@@ -33,8 +33,12 @@ export default {
   },
 
   watch: { 
+    reset:function(){
+      this.indexAt = 0;
+      this.projectsDisplay = [];
+    },
     projects: async function(newVal, oldVal) { // watch it
-        console.log(newVal);
+        console.log("TEST2");
         if(oldVal.length > newVal.length){
           this.indexAt = 0
           this.projectsDisplay = []
