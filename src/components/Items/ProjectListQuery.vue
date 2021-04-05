@@ -1,7 +1,7 @@
 <template>
   <div class = "listProject" v-on:scroll="handleScroll">
     <div v-bind:key="project.id" v-for="project in projectsDisplay">
-        <Project v-bind:project="project" v-bind:token="token"  v-bind:comments="comments" 
+        <Project v-bind:project="project" v-bind:token="token"  v-bind:Comments="Comments" 
           @loadedMembersProject="loadMembersProjectList" 
           @loadedTagsProject="loadTagsProjectList"
           @loadedPipelinesProject="loadPipelinesProjectList"/>
@@ -17,7 +17,7 @@ export default {
   components: {
     Project
   },
-  props: ["projects","token", "comments"],
+  props: ["projects","token", "Comments"],
   data(){
     return{
       indexAt: 0,
@@ -47,7 +47,8 @@ export default {
             projectToAdd = newVal.length - this.indexAt
           }
 
-          this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
+        // this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
+    this.projectsDisplay = this.projects
           this.indexAt = this.indexAt + projectToAdd + 1
         }
         

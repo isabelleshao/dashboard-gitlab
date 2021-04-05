@@ -7,12 +7,14 @@
             name="perso"
             id=""
             rows="10"
-            v-model="Comments[0].note1"
+            v-bind:value="this.displayCommentaires()"
             ref="note1"
           >
           </textarea>
           <div class="controls">
-            <button @click="saveNote1()">Enregistrer commentaires perso</button>
+            <button @click="updateCommentaire()" ref="bouton1">
+              Enregistrer commentaires perso
+            </button>
           </div>
         </div>
 
@@ -37,68 +39,87 @@
 import axios from "axios";
 export default {
   name: "Comments",
-  props: ["Comments"],
+  props: ["Comments", "token", "project"],
 
   data() {
     return {
       updatedNotes: [],
     };
   },
+
+
+
   methods: {
-    /*    saveNote1() {
-      let value = this.$refs.note1.value;
-      console.log(value);
-      this.Comments[0].note1 = value;
-      this.updatedNotes = this.Comments;
+
+          upToDateCommentaire(){
+      for (var i = 0; i < this.Comments.length; i++) {
+        if (this.project.id == this.Comments[i].idProjet) {
+           if (this.project.last_activity_at == this.Comments[i].lastCommit){
+//this.$refs.bouton1.classList.value = 'aCorriger';
 
 
-   axios.put("https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/README.md",{
-    headers: {
-        'Content-Type': 'application/json',
-        "PRIVATE-TOKEN" : this.$props.token
+
+            console.log("bllaaa")
+           }
+        }
+      }
+            
+        },
+    
+    displayCommentaires() {
+      for (var i = 0; i < this.Comments.length; i++) {
+        if (this.project.id == this.Comments[i].idProjet) {
+          return this.Comments[i].note1;
+        }
+      }
     },
 
-    content: {
-        branch: "master",
-        content: "testsss",
-        commit_message: "update file",
-      },
+    updateCommentaire() {
 
-    })
-    .then((res) => {
-   console.log(res.data);
-
-    // this.$emit("loadedTags",this.tags)
-    })
-    .catch((error) => {
-    console.error(error)
-    })
-
-
-    },*/
-    saveNote1() {
       let value = this.$refs.note1.value;
+      let commentaireExistant = false;
+
+      // check s'il faut ecraser un commentaire
+      for (let i = 0; i < this.Comments.length; i++) {
+        if (this.project.id == this.Comments[i].idProjet) {
+        //  alert("commentaire existant !");
+          this.Comments[i].note1 = value;
+          this.Comments[i].lastCommit = this.project.last_activity_at,
+          commentaireExistant = true;
+        }
+      }
+      //  si l'entrée n'est pas definie, creer l'entrée
+      if (!commentaireExistant) {
+        //alert("commentaire non existant !");
+        this.Comments.push({
+          idProjet: this.project.id,
+          note1: value,
+          note2: this.note2,
+          lastCommit: this.project.last_activity_at,
+        });
+      }
+
       console.log(value);
       this.Comments[0].note1 = value;
       this.updatedNotes = this.Comments;
 
       var postD = {
-        branch: 'master',
-        content: 'LUL',
-        commit_message: 'updatefile',
+        branch: "master",
+        content: JSON.stringify(this.Comments),
+        commit_message: "TEST???",
       };
 
       let axiosConfig = {
         headers: {
-          "Content-Type": "application/json;charset=UTF-8",
+          "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
           "PRIVATE-TOKEN": this.$props.token,
         },
       };
 
       axios
-        .post(
-          "https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/blublu.json",
+        .put(
+          "https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/notes.json",
           postD,
           axiosConfig
         )
@@ -108,43 +129,13 @@ export default {
         .catch((err) => {
           console.log("AXIOS ERROR: ", err);
         });
-
-      /*   axios
-      .put(
-          "https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/README.md",    {
-            branch: "master",   content: " LUL",  commit_message: "update file"},
-            {headers: 
-             {"Content-Type": "application/json","PRIVATE-TOKEN": this.$props.token,}},
-    
-        )
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          console.log(error);
-        });*/
-
-      /*     const url =
-        "https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/blublu.md";
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          "PRIVATE-TOKEN": this.$props.token,
-          "Access-Control-Allow-Origin": "POST",
-        },
-      };
-      const content = {
-        "branch": "master",
-        "content": "testsss",
-        "commit_message": "update file",
-      };
-
-      axios.post(url, content, config).then((response) => {
-        console.log(response.data);
-      });
-*/
     },
   },
+
+            created(){
+              //this.$refs["bouton1"].style.backgroundColor = '#000';
+            
+        },
 };
 </script>
 

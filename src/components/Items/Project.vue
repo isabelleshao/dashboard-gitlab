@@ -19,7 +19,7 @@
     
     <Pipeline v-bind:project="this.project" v-bind:token="token" @loadedPipelines="loadPipelinesProject"/>
       </div><div class="col2">
-        <Comments  v-bind:comments="comments" /></div>
+        <Comments  v-bind:token="token"  v-bind:Comments="Comments" v-bind:project="this.project"/></div>
   </div>
   </div>
 </template>
@@ -38,7 +38,7 @@
             Tags,
             Comments
         },
-        props: ["project","token", "comments"],
+        props: ["project","token", "Comments"],
 
         data(){
             return{
@@ -73,6 +73,10 @@
             loadPipelinesProject(pipelines){
                 this.$emit("loadedPipelinesProject", this.project.id, pipelines)
             },
+
+
+
+            
         },
 
         created(){
@@ -80,6 +84,7 @@
             var dateTime = new Date(this.project.last_activity_at).toLocaleTimeString()
             this.$set(this.date,"dateDDMMYY",date)
             this.$set(this.date,"dateTime",dateTime)
+            
         },
     }
 </script>
