@@ -132,7 +132,7 @@ export default {
         this.isLoaded = true
       }
       if(s.user.length > 0){
-        this.projectsQuery = await this.getProjectByUser(s.user)
+        this.getProjectByUser(s.user)
         this.isLoaded = true
         console.log(this.projectsQuery)
       }
@@ -326,33 +326,32 @@ export default {
 
     async getProjectByUser(strMember) {
         var userSearch = strMember.toUpperCase()
-        var indexToKeep = []
+        
+        var projectTemp = this.projectsQuery
+        this.projectsQuery = [];
 
 
-        const size = this.projectsQuery.length
+        const size = projectTemp.length
         for(var i = 0; i < size ; i++){ 
           var listUserProject 
-          if(!this.projectsQuery[i].members){
-            listUserProject = (await this.getProjectByUser_aux(this.projectsQuery[i])).data;
-            this.projectsQuery[i].members = listUserProject
-            this.loadMembersApp(this.projectsQuery[i].id, listUserProject)
+          if(!projectTemp[i].members){
+            listUserProject = (await this.getProjectByUser_aux(projectTemp[i])).data;
+            projectTemp[i].members = listUserProject
+            this.loadMembersApp(projectTemp[i].id, listUserProject)
           }else{
-            listUserProject = this.projectsQuery[i].members;
+            listUserProject = projectTemp[i].members;
           }
           for (var k = 0; k < listUserProject.length; k++) {
             var userUsername = listUserProject[k]['name'].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
             var userName = listUserProject[k]['username'].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
 
             if(userName.includes(userSearch) || userUsername.includes(userSearch)){
-              indexToKeep.push(i)
+              this.reset += 1;
+              this.projectsQuery.push(projectTemp[i])
             }
           }
 
         }
-        var projectbyusers = indexToKeep.map(j => this.projectsQuery[j]);
-
-        console.log(projectbyusers)
-        return projectbyusers
     },
 
 

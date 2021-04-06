@@ -38,7 +38,6 @@ export default {
       this.projectsDisplay = [];
     },
     projects: async function(newVal, oldVal) { // watch it
-        console.log("TEST2");
         if(oldVal.length > newVal.length){
           this.indexAt = 0
           this.projectsDisplay = []
