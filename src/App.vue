@@ -64,7 +64,6 @@ export default {
     projects: function(newVal) {
 
       var projectTitleToDisplay = []
-      console.log(this.filterTitle)
       if(this.filterTitle.length > 0){
           for(var proj of newVal){
             var toAdd = true
@@ -134,10 +133,9 @@ export default {
       if(s.user.length > 0){
         this.getProjectByUser(s.user)
         this.isLoaded = true
-        console.log(this.projectsQuery)
       }
       if(s.tag.length > 0){
-        this.projectsQuery = await this.getProjectByTag(s.tag)
+        this.getProjectByTag(s.tag)
         this.isLoaded = true
       } 
       
@@ -346,8 +344,8 @@ export default {
             var userName = listUserProject[k]['username'].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
 
             if(userName.includes(userSearch) || userUsername.includes(userSearch)){
-              this.reset += 1;
               this.projectsQuery.push(projectTemp[i])
+              this.reset += 1;
             }
           }
 
@@ -370,33 +368,34 @@ export default {
 
     async getProjectByTag(strTag) {
         var tagSearch = strTag.toUpperCase()
-        var indexToKeep = []
 
-        const size = this.projectsQuery.length
+        var projectTemp = this.projectsQuery
+        this.projectsQuery = [];
+
+
+        const size = projectTemp.length
 
         for(var i = 0; i < size ; i++){ 
           var listTagProject 
-          if(!this.projectsQuery[i].tags){
-            listTagProject = (await this.getProjectByTag_aux(this.projectsQuery[i])).data;
-            this.projectsQuery[i].tags = listTagProject
-            this.loadMembersApp(this.projectsQuery[i].id, listTagProject)
+          if(!projectTemp[i].tags){
+            listTagProject = (await this.getProjectByTag_aux(projectTemp[i])).data;
+            projectTemp[i].tags = listTagProject
+            this.loadTagsApp(projectTemp[i].id, listTagProject)
           }else{
-            listTagProject = this.projectsQuery[i].tags;
+            listTagProject = projectTemp[i].tags;
           }
 
           for(var j = 0; j < listTagProject.length; j++){
             var tagName = listTagProject[j]['name'].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
             if(tagName.includes(tagSearch)){
-              if(!indexToKeep.includes(i)){
-                indexToKeep.push(i)
+              if(!this.projectsQuery.includes(projectTemp[i])){
+                this.projectsQuery.push(projectTemp[i])
+                this.reset += 1;
               }
             }
 
           }
         }
-
-        var projectbytags = indexToKeep.map(j => this.projectsQuery[j]);
-        return projectbytags
     },
   },
 };
