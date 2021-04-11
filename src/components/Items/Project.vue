@@ -19,7 +19,7 @@
     
     <Pipeline v-bind:project="this.project" v-bind:token="token" @loadedPipelines="loadPipelinesProject"/>
       </div><div class="col2">
-        <Comments  v-bind:token="token"  v-bind:Comments="Comments" v-bind:project="this.project"/></div>
+        <Comments  v-bind:token="token"   v-bind:CommentsProjetID="CommentsProjetID" v-bind:Comments="Comments" v-bind:project="this.project"/></div>
   </div>
   </div>
 </template>
@@ -38,7 +38,7 @@
             Tags,
             Comments
         },
-        props: ["project","token", "Comments"],
+        props: ["project","token", "Comments","CommentsProjetID"],
 
         data(){
             return{

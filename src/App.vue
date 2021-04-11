@@ -20,6 +20,7 @@
         v-bind:projects="projectsQuery"
         v-bind:token="this.token"
         v-bind:Comments="Comments"
+        v-bind:CommentsProjetID="CommentsProjetID"
         v-if="isLoaded & !GroupIsNotSelected"
       />
       <ProjectList
@@ -65,11 +66,12 @@ export default {
 
       filterTitle: [],
       Comments: [],
+      CommentsProjetID: null,
     };
   },
   created() {
-    this.recupererNotes();
-    this.creerRepoNote();
+    //this.recupererNotes();
+    this.identifierUser();
   },
 
   watch: {
@@ -98,67 +100,8 @@ export default {
     },
   },
   methods: {
-    creerProjetNotes() {
-      var postD = {
-        name: "notesx",
-      };
-
-      let axiosConfig = {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "PRIVATE-TOKEN": this.token,
-        },
-      };
-
-      axios
-        .post("https://pstl.algo-prog.info/api/v4/projects", postD, axiosConfig)
-        .then((res) => {
-          console.log("RESPONSE RECEIVED: ", res);
-
-          let idProj = res.data.id;
-          
-          
-          ///////////////
-
-  var postD = {
-        branch: "master",
-        content: "some content",
-        commit_message: "Creation JSON notes.",
-      };
-
-      let axiosConfig = {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "PRIVATE-TOKEN": this.token,
-        },
-      };
-
-      axios
-        .post(
-          "https://pstl.algo-prog.info/api/v4/projects/"+idProj+"/repository/files/notes.json",
-          postD,
-          axiosConfig
-        )
-        .then((res) => {
-          console.log("RESPONSE RECEIVED: ", res);
-        })
-        .catch((err) => {
-          console.log("AXIOS ERROR: ", err);
-        });
-  
-          //////////////
-
-
-        })
-        .catch((err) => {
-          console.log("AXIOS ERROR: ", err);
-        });
-    },
-    creerRepoNote() {
+    identifierUser() {
       // recuperer l'identifiant de l'user :
-
       axios
         .get(this.gitlaburl + "/user/", {
           headers: {
@@ -169,8 +112,6 @@ export default {
         })
 
         .then((res) => {
-          console.log(res.data.id);
-
           //////recuperer tous les projets de l'user
           axios
             .get(this.gitlaburl + "/users/" + res.data.id + "/projects", {
@@ -185,24 +126,22 @@ export default {
               let projetExistant = false;
 
               for (let i = 0; i < res.data.length; i++) {
-                if (res.data[i].name == "notesx") {
+                if (res.data[i].name == "notes") {
                   projetExistant = true;
-                  console.log(res.data[i]);
+                  this.CommentsProjetID = res.data[i].id;
                 }
               }
 
               if (!projetExistant) {
-                ////
-                this.creerProjetNotes();
-                /////
+                this.creer_Projet_Notes();
+              } else {
+                this.recuperer_Notes();
               }
             })
 
             .catch((error) => {
               console.error(error);
             });
-
-          /////
         })
 
         .catch((error) => {
@@ -210,10 +149,61 @@ export default {
         });
     },
 
-    recupererNotes() {
+    creer_Projet_Notes() {
+      let axiosConfig = {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "PRIVATE-TOKEN": this.token,
+        },
+      };
+
+      axios
+        .post(this.gitlaburl + "/projects", { name: "notes" }, axiosConfig)
+        .then((res) => {
+                   this.CommentsProjetID = res.data.id;
+          console.log("RESPONSE RECEIVED: ", res);
+
+          axios
+            .post(
+              this.gitlaburl +
+                "/projects/" +
+                res.data.id +
+                "/repository/files/notes.json",
+              {
+                branch: "master",
+                content: "[]",
+                commit_message: "Creation JSON notes.",
+              },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  "Access-Control-Allow-Origin": "*",
+                  "PRIVATE-TOKEN": this.token,
+                },
+              }
+            )
+            .then((res) => {
+              console.log("RESPONSE RECEIVED: ", res);
+     
+            })
+            .catch((err) => {
+              console.log("AXIOS ERROR: ", err);
+            });
+        })
+        .catch((err) => {
+          console.log("projet errrrr");
+          console.log("AXIOS ERROR: ", err);
+        });
+    },
+
+    recuperer_Notes() {
       axios
         .get(
-          "https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/notes.json/raw?ref=master",
+          this.gitlaburl +
+            "/projects/" +
+            this.CommentsProjetID +
+            "/repository/files/notes.json/raw?ref=master",
           {
             headers: {
               "Access-Control-Allow-Origin": "GET",
@@ -222,12 +212,9 @@ export default {
             },
           }
         )
-
         .then((res) => {
-          console.log(res.data);
           this.Comments = res.data;
         })
-
         .catch((error) => {
           console.error(error);
         });

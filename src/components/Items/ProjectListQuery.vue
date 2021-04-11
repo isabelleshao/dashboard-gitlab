@@ -1,7 +1,7 @@
 <template>
   <div class = "listProject" v-on:scroll="handleScroll">
     <div v-bind:key="project.id" v-for="project in projectsDisplay">
-        <Project v-bind:project="project" v-bind:token="token"  v-bind:Comments="Comments" 
+        <Project v-bind:project="project" v-bind:token="token"  v-bind:Comments="Comments"  v-bind:CommentsProjetID="CommentsProjetID"
           @loadedMembersProject="loadMembersProjectList" 
           @loadedTagsProject="loadTagsProjectList"
           @loadedPipelinesProject="loadPipelinesProjectList"/>
@@ -17,7 +17,7 @@ export default {
   components: {
     Project
   },
-  props: ["projects","token", "Comments"],
+  props: ["projects","token", "Comments","CommentsProjetID"],
   data(){
     return{
       indexAt: 0,

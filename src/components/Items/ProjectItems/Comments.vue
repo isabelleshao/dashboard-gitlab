@@ -1,5 +1,7 @@
 <template>
   <div class="Comments">
+     <div :id="this.project.id">
+{{upToDateCommentaire() }}</div>
     <div class="hrefWraper">
       <div class="box">
         <div class="wrapper">
@@ -27,7 +29,7 @@
             ref="note2"
           ></textarea>
           <div class="controls">
-            <button @click="updateCommentaire2()" ref="bouton1">
+            <button @click="updateCommentaire2()" ref="bouton2">
               Envoyer à l'élève les commentaires
             </button>
           </div>
@@ -41,7 +43,7 @@
 import axios from "axios";
 export default {
   name: "Comments",
-  props: ["Comments", "token", "project"],
+  props: ["Comments", "token", "project", "CommentsProjetID"],
 
   data() {
     return {};
@@ -52,12 +54,13 @@ export default {
       for (var i = 0; i < this.Comments.length; i++) {
         if (this.project.id == this.Comments[i].idProjet) {
           if (this.project.last_activity_at == this.Comments[i].lastCommit) {
-            //this.$refs.bouton1.classList.value = 'aCorriger';
 
-            console.log("bllaaa");
+return "corrigé!"
+           // this.$refs.bouton2.classList.value =  this.$refs.bouton2.classList.value + "uptodate";
           }
         }
       }
+      return "à corriger"
     },
 
     displayCommentaires1() {
@@ -78,6 +81,7 @@ export default {
       } else {
         for (var i = 0; i < this.Comments.length; i++) {
           if (this.project.id == this.Comments[i].idProjet) {
+                  
             return this.Comments[i].note2;
           }
         }
@@ -87,19 +91,16 @@ export default {
     updateCommentaire1() {
       let value = this.$refs.note1.value;
       let commentaireExistant = false;
-      console.log("projectid" + this.project.id);
       // check s'il faut ecraser un commentaire
       for (let i = 0; i < this.Comments.length; i++) {
         if (this.project.id == this.Comments[i].idProjet) {
           this.Comments[i].note1 = value;
-          console.log("tab json" + this.Comments[i].idProjet);
-          (this.Comments[i].lastCommit = this.project.last_activity_at),
-            (commentaireExistant = true);
+          this.Comments[i].lastCommit = this.project.last_activity_at;
+          commentaireExistant = true;
         }
       }
       //  si l'entrée n'est pas definie, creer l'entrée
       if (!commentaireExistant) {
-        //alert("commentaire non existant !");
         this.Comments.push({
           idProjet: this.project.id,
           note1: value,
@@ -108,12 +109,10 @@ export default {
         });
       }
 
-      //console.log(value);
-
-      var postD = {
+      var putData = {
         branch: "master",
         content: JSON.stringify(this.Comments),
-        commit_message: "TEST???",
+        commit_message: "Update notes",
       };
 
       let axiosConfig = {
@@ -126,8 +125,10 @@ export default {
 
       axios
         .put(
-          "https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/notes.json",
-          postD,
+          "https://pstl.algo-prog.info/api/v4/projects/" +
+            this.CommentsProjetID +
+            "/repository/files/notes.json",
+          putData,
           axiosConfig
         )
         .then((res) => {
@@ -141,19 +142,17 @@ export default {
     updateCommentaire2() {
       let value = this.$refs.note2.value;
       let commentaireExistant = false;
-      console.log("projectid" + this.project.id);
+
       // check s'il faut ecraser un commentaire
       for (let i = 0; i < this.Comments.length; i++) {
         if (this.project.id == this.Comments[i].idProjet) {
           this.Comments[i].note2 = value;
-          console.log("tab json" + this.Comments[i].idProjet);
           (this.Comments[i].lastCommit = this.project.last_activity_at),
             (commentaireExistant = true);
         }
       }
       //  si l'entrée n'est pas definie, creer l'entrée
       if (!commentaireExistant) {
-        //alert("commentaire non existant !");
         this.Comments.push({
           idProjet: this.project.id,
           note1: this.note1,
@@ -162,12 +161,10 @@ export default {
         });
       }
 
-      //console.log(value);
-
       var postD = {
         branch: "master",
         content: JSON.stringify(this.Comments),
-        commit_message: "TEST???",
+        commit_message: "Update notes",
       };
 
       let axiosConfig = {
@@ -180,11 +177,16 @@ export default {
 
       axios
         .put(
-          "https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/notes.json",
+          "https://pstl.algo-prog.info/api/v4/projects/" +
+            this.CommentsProjetID +
+            "/repository/files/notes.json",
           postD,
           axiosConfig
         )
         .then((res) => {
+          this.$refs.bouton2.classList.value =this.$refs.bouton2.classList.value + "uptodate";
+          this.$refs.bouton2.getAnimations.
+          alert("commentaire posté!");
           console.log("RESPONSE RECEIVED: ", res);
         })
         .catch((err) => {
@@ -193,13 +195,15 @@ export default {
     },
   },
 
-  created() {
-    //this.$refs["bouton1"].style.backgroundColor = '#000';
-  },
+  created() {},
 };
 </script>
 
 <style scoped>
+button.uptodate {
+  background-color: #93cf8c;
+}
+
 .Member {
   float: left;
 }
@@ -249,7 +253,7 @@ p {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   border-bottom: 1px dotted #999;
-  resize: none;
+  resize: vertical;
 }
 .wrapper textarea:focus {
   outline: none;
@@ -259,7 +263,6 @@ p {
   margin-top: -6px;
 }
 button {
-  background: linear-gradient(to bottom, #ffffff 0%, #e5e5e5 100%);
   border: 1px solid #999;
   padding: 10px 25px;
   font-weight: bold;
