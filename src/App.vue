@@ -3,18 +3,33 @@
     <Header />
 
     <div class="flexContainer">
-      <FilterPanel @new-search="addSearch2" @resetsearch="resetsearch" v-bind:token="this.token"/>
-      
-      <GroupSelection v-bind:gitlaburl="this.gitlaburl" v-bind:token="this.token" v-if="GroupIsNotSelected" @addGroupSearch="addGroupSearch"/>
+      <FilterPanel
+        @new-search="addSearch2"
+        @resetsearch="resetsearch"
+        v-bind:token="this.token"
+      />
 
-      <ProjectListQuery v-bind:projects="projectsQuery" v-bind:token="this.token"  v-bind:Comments="Comments" v-if="isLoaded & !GroupIsNotSelected"/>
-      <ProjectList 
-        v-bind:projects="projects" 
-        v-bind:token="this.token" 
+      <GroupSelection
+        v-bind:gitlaburl="this.gitlaburl"
+        v-bind:token="this.token"
+        v-if="GroupIsNotSelected"
+        @addGroupSearch="addGroupSearch"
+      />
+
+      <ProjectListQuery
+        v-bind:projects="projectsQuery"
+        v-bind:token="this.token"
+        v-bind:Comments="Comments"
+        v-if="isLoaded & !GroupIsNotSelected"
+      />
+      <ProjectList
+        v-bind:projects="projects"
+        v-bind:token="this.token"
         @loadedMembersProjectList="loadMembersApp"
-        @loadedTagsProjectList="loadTagsApp" 
-        @loadedPipelinesProjectList="loadPipelinesApp" 
-        v-else-if="!GroupIsNotSelected"/>
+        @loadedTagsProjectList="loadTagsApp"
+        @loadedPipelinesProjectList="loadPipelinesApp"
+        v-else-if="!GroupIsNotSelected"
+      />
     </div>
   </div>
 </template>
@@ -25,7 +40,7 @@ import ProjectList from "./components/Items/ProjectList";
 import ProjectListQuery from "./components/Items/ProjectListQuery";
 import FilterPanel from "./components/FilterPanel/FilterPanel";
 import GroupSelection from "./components/GroupSelection/GroupSelection";
-import token from "../token.json"
+import token from "../token.json";
 import axios from "axios";
 
 export default {
@@ -43,123 +58,226 @@ export default {
       GroupIsNotSelected: true,
       projects: [],
       filterIn: [],
-      
-      projectsQuery:[],
-      token:token.token,
+
+      projectsQuery: [],
+      token: token.token,
       gitlaburl: "https://pstl.algo-prog.info/api/v4",
 
       filterTitle: [],
-      Comments :[]
-
+      Comments: [],
     };
   },
   created() {
     this.recupererNotes();
+    this.creerRepoNote();
   },
 
-  watch:{
-    projects: function(newVal) {
-
-      var projectTitleToDisplay = []
-      console.log(this.filterTitle)
-      if(this.filterTitle.length > 0){
-          for(var proj of newVal){
-            var toAdd = true
-            for(var strName of this.filterTitle){
-              if (strName.length > 0) {
-                  if(!proj.name.toLowerCase().includes(strName.toLowerCase())){
-                    toAdd = false
-                  }
+  watch: {
+    projects: function (newVal) {
+      var projectTitleToDisplay = [];
+      console.log(this.filterTitle);
+      if (this.filterTitle.length > 0) {
+        for (var proj of newVal) {
+          var toAdd = true;
+          for (var strName of this.filterTitle) {
+            if (strName.length > 0) {
+              if (!proj.name.toLowerCase().includes(strName.toLowerCase())) {
+                toAdd = false;
               }
             }
-            if(toAdd){
-              projectTitleToDisplay.push(proj)
-            }
           }
+          if (toAdd) {
+            projectTitleToDisplay.push(proj);
+          }
+        }
+      } else {
+        projectTitleToDisplay = newVal;
       }
-      else{
-        projectTitleToDisplay = newVal
-      }  
 
-      this.projectsQuery = projectTitleToDisplay
-    }  
+      this.projectsQuery = projectTitleToDisplay;
+    },
   },
   methods: {
+    creerProjetNotes() {
+      var postD = {
+        name: "notesx",
+      };
 
-    recupererNotes(){
+      let axiosConfig = {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "PRIVATE-TOKEN": this.token,
+        },
+      };
 
- axios.get("https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/notes.json/raw?ref=master", {        
+      axios
+        .post("https://pstl.algo-prog.info/api/v4/projects", postD, axiosConfig)
+        .then((res) => {
+          console.log("RESPONSE RECEIVED: ", res);
+
+          let idProj = res.data.id;
+          
+          
+          ///////////////
+
+  var postD = {
+        branch: "master",
+        content: "some content",
+        commit_message: "Creation JSON notes.",
+      };
+
+      let axiosConfig = {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "PRIVATE-TOKEN": this.token,
+        },
+      };
+
+      axios
+        .post(
+          "https://pstl.algo-prog.info/api/v4/projects/"+idProj+"/repository/files/notes.json",
+          postD,
+          axiosConfig
+        )
+        .then((res) => {
+          console.log("RESPONSE RECEIVED: ", res);
+        })
+        .catch((err) => {
+          console.log("AXIOS ERROR: ", err);
+        });
+  
+          //////////////
+
+
+        })
+        .catch((err) => {
+          console.log("AXIOS ERROR: ", err);
+        });
+    },
+    creerRepoNote() {
+      // recuperer l'identifiant de l'user :
+
+      axios
+        .get(this.gitlaburl + "/user/", {
           headers: {
-             "Access-Control-Allow-Origin": "GET",
+            "Access-Control-Allow-Origin": "GET",
             "Content-Type": "application/json",
             "PRIVATE-TOKEN": this.token,
           },
         })
 
         .then((res) => {
-console.log(res.data)
-this.Comments =  (res.data);
+          console.log(res.data.id);
 
+          //////recuperer tous les projets de l'user
+          axios
+            .get(this.gitlaburl + "/users/" + res.data.id + "/projects", {
+              headers: {
+                "Access-Control-Allow-Origin": "GET",
+                "Content-Type": "application/json",
+                "PRIVATE-TOKEN": this.token,
+              },
+            })
 
+            .then((res) => {
+              let projetExistant = false;
+
+              for (let i = 0; i < res.data.length; i++) {
+                if (res.data[i].name == "notesx") {
+                  projetExistant = true;
+                  console.log(res.data[i]);
+                }
+              }
+
+              if (!projetExistant) {
+                ////
+                this.creerProjetNotes();
+                /////
+              }
+            })
+
+            .catch((error) => {
+              console.error(error);
+            });
+
+          /////
         })
 
-          .catch((error) => {
-            console.error(error);
-          })
-  
-
-
+        .catch((error) => {
+          console.error(error);
+        });
     },
 
-    loadMembersApp(id, members){
-      for(const proj of this.projects){
-        if(proj.id == id){
-          proj.members = members
+    recupererNotes() {
+      axios
+        .get(
+          "https://pstl.algo-prog.info/api/v4/projects/1320/repository/files/notes.json/raw?ref=master",
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "GET",
+              "Content-Type": "application/json",
+              "PRIVATE-TOKEN": this.token,
+            },
+          }
+        )
+
+        .then((res) => {
+          console.log(res.data);
+          this.Comments = res.data;
+        })
+
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+
+    loadMembersApp(id, members) {
+      for (const proj of this.projects) {
+        if (proj.id == id) {
+          proj.members = members;
         }
       }
     },
-    loadTagsApp(id, tags){
-      for(const proj of this.projects){
-        if(proj.id == id){
-          proj.tags = tags
+    loadTagsApp(id, tags) {
+      for (const proj of this.projects) {
+        if (proj.id == id) {
+          proj.tags = tags;
         }
       }
     },
-    loadPipelinesApp(id, pipelines){
-      for(const proj of this.projects){
-        if(proj.id == id){
-          proj.pipelines = pipelines
+    loadPipelinesApp(id, pipelines) {
+      for (const proj of this.projects) {
+        if (proj.id == id) {
+          proj.pipelines = pipelines;
         }
       }
     },
-
-    
 
     resetsearch() {
-      this.filterTitle = []
-      this.isLoaded = false
-      this.projectsQuery = this.projects
+      this.filterTitle = [];
+      this.isLoaded = false;
+      this.projectsQuery = this.projects;
     },
 
     async addSearch2(s) {
-
-      if(s.name == "project-name"){
-        this.filterTitle.push(s.title)
+      if (s.name == "project-name") {
+        this.filterTitle.push(s.title);
       }
 
-      if(s.title.length > 0){
-        this.projectsQuery = this.getProjectByName(s.title)
-        this.isLoaded = true
+      if (s.title.length > 0) {
+        this.projectsQuery = this.getProjectByName(s.title);
+        this.isLoaded = true;
       }
-      if(s.user.length > 0){
-        this.projectsQuery = await this.getProjectByUser(s.user)
-        this.isLoaded = true
+      if (s.user.length > 0) {
+        this.projectsQuery = await this.getProjectByUser(s.user);
+        this.isLoaded = true;
       }
-      if(s.tag.length > 0){
-        this.projectsQuery = await this.getProjectByTag(s.tag)
-        this.isLoaded = true
-      } 
-      
+      if (s.tag.length > 0) {
+        this.projectsQuery = await this.getProjectByTag(s.tag);
+        this.isLoaded = true;
+      }
 
       /*
       if (s.user.length > 0) {
@@ -178,69 +296,65 @@ this.Comments =  (res.data);
       this.projects = this.getProjectByName(s.title); */
     },
 
-    async addGroupSearch(group){
+    async addGroupSearch(group) {
       const response = await this.getProjectByGroup(group);
-      const groupProjects = response.data.projects
-      var projectsToDisplay = []
-      var per_page = 150
+      const groupProjects = response.data.projects;
+      var projectsToDisplay = [];
+      var per_page = 150;
 
-      for(const proj of groupProjects){
-        axios.get(this.gitlaburl + "/projects/" + proj.id + "/forks", {        
-          headers: {
-            "Access-Control-Allow-Origin": "GET",
-            "Content-Type": "application/json",
-            "PRIVATE-TOKEN": this.token,
-          },
-          params: {
-            page: 1,
-            per_page: per_page
-          }
-        })
-        .then((res) => {
-          for(var k = 0; k < res.data.length; k++){
-            projectsToDisplay.push(res.data[k])
-          }
-          var totalPages = res.headers["x-total-pages"];
-          var i;
+      for (const proj of groupProjects) {
+        axios
+          .get(this.gitlaburl + "/projects/" + proj.id + "/forks", {
+            headers: {
+              "Access-Control-Allow-Origin": "GET",
+              "Content-Type": "application/json",
+              "PRIVATE-TOKEN": this.token,
+            },
+            params: {
+              page: 1,
+              per_page: per_page,
+            },
+          })
+          .then((res) => {
+            for (var k = 0; k < res.data.length; k++) {
+              projectsToDisplay.push(res.data[k]);
+            }
+            var totalPages = res.headers["x-total-pages"];
+            var i;
 
-          
-          for(i = 2; i<=totalPages; i++){
-            axios
-            .get(this.gitlaburl + "/projects/" + proj.id + "/forks", {        
-              headers: {
-                "Access-Control-Allow-Origin": "GET",
-                "Content-Type": "application/json",
-                "PRIVATE-TOKEN": this.token,
-              },
-              params: {
-                page: i,
-                per_page: per_page
-              }
-            })
-            .then((resNextProj) => {
-                for(var j = 0; j < resNextProj.data.length; j++){
-                  projectsToDisplay.push(resNextProj.data[j])
-                }
-                this.projects = projectsToDisplay
-              })
-            .catch((error) => {
-              console.error(error);
-            });
-          }
-          this.projects = projectsToDisplay;
-          console.log(this.projets)
+            for (i = 2; i <= totalPages; i++) {
+              axios
+                .get(this.gitlaburl + "/projects/" + proj.id + "/forks", {
+                  headers: {
+                    "Access-Control-Allow-Origin": "GET",
+                    "Content-Type": "application/json",
+                    "PRIVATE-TOKEN": this.token,
+                  },
+                  params: {
+                    page: i,
+                    per_page: per_page,
+                  },
+                })
+                .then((resNextProj) => {
+                  for (var j = 0; j < resNextProj.data.length; j++) {
+                    projectsToDisplay.push(resNextProj.data[j]);
+                  }
+                  this.projects = projectsToDisplay;
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+            }
+            this.projects = projectsToDisplay;
+            console.log(this.projets);
           })
           .catch((error) => {
             console.error(error);
-          })
+          });
 
-          this.GroupIsNotSelected = false;
-          this.isLoaded = true;
-  
+        this.GroupIsNotSelected = false;
+        this.isLoaded = true;
       }
-
-
-      
 
       /*
       axios.get(proj + "/projects", {        
@@ -306,15 +420,14 @@ this.Comments =  (res.data);
       this.projects = this.filterIn;
     },
 
-    getProjectByGroup(group){
-      return axios
-      .get(this.gitlaburl + "/groups/" + group.id,{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : this.token
-            }
-      })
+    getProjectByGroup(group) {
+      return axios.get(this.gitlaburl + "/groups/" + group.id, {
+        headers: {
+          "Access-Control-Allow-Origin": "GET",
+          "Content-Type": "application/json",
+          "PRIVATE-TOKEN": this.token,
+        },
+      });
     },
     getProjectByName(strName) {
       // retourne liste des projets matchant avec le nom du projet
@@ -335,74 +448,85 @@ this.Comments =  (res.data);
     ////////////////////////////////////////////////////
     getProjectByUser_aux(proj) {
       //pour chaque projet, recupère la liste des membres et la renvoit
-      return axios
-      .get(proj._links.members, {
+      return axios.get(proj._links.members, {
         headers: {
           "Access-Control-Allow-Origin": "GET",
           "Content-Type": "application/json",
           "PRIVATE-TOKEN": this.token,
         },
-      })
+      });
     },
 
     async getProjectByUser(strMember) {
-        var userSearch = strMember.toUpperCase()
-        var indexToKeep = []
+      var userSearch = strMember.toUpperCase();
+      var indexToKeep = [];
 
-        const size = this.projectsQuery.length
+      const size = this.projectsQuery.length;
 
-        for(var i = 0; i < size ; i++){ 
-          var listUserProject = (await this.getProjectByUser_aux(this.projectsQuery[i])).data;
-          for (var k = 0; k < listUserProject.length; k++) {
-            var userUsername = listUserProject[k]['name'].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
-            var userName = listUserProject[k]['username'].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
+      for (var i = 0; i < size; i++) {
+        var listUserProject = (
+          await this.getProjectByUser_aux(this.projectsQuery[i])
+        ).data;
+        for (var k = 0; k < listUserProject.length; k++) {
+          var userUsername = listUserProject[k]["name"]
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase();
+          var userName = listUserProject[k]["username"]
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase();
 
-            if(userName.includes(userSearch) || userUsername.includes(userSearch)){
-              indexToKeep.push(i)
-            }
+          if (
+            userName.includes(userSearch) ||
+            userUsername.includes(userSearch)
+          ) {
+            indexToKeep.push(i);
           }
-
         }
-        var projectbyusers = indexToKeep.map(j => this.projectsQuery[j]);
-        return projectbyusers
+      }
+      var projectbyusers = indexToKeep.map((j) => this.projectsQuery[j]);
+      return projectbyusers;
     },
-
 
     ////////////////////////////////////////////////////
     getProjectByTag_aux(proj) {
       //pour chaque projet, recupère la liste des membres et la renvoit
-      return axios
-      .get(proj._links.self + "/repository/tags",{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : this.token
-            }
-      })
+      return axios.get(proj._links.self + "/repository/tags", {
+        headers: {
+          "Access-Control-Allow-Origin": "GET",
+          "Content-Type": "application/json",
+          "PRIVATE-TOKEN": this.token,
+        },
+      });
     },
 
     async getProjectByTag(strTag) {
-        var tagSearch = strTag.toUpperCase()
-        var indexToKeep = []
+      var tagSearch = strTag.toUpperCase();
+      var indexToKeep = [];
 
-        const size = this.projectsQuery.length
+      const size = this.projectsQuery.length;
 
-        for(var i = 0; i < size ; i++){ 
-          var listTagProject = (await this.getProjectByTag_aux(this.projectsQuery[i])).data;
-          
-          for(var j = 0; j < listTagProject.length; j++){
-            var tagName = listTagProject[j]['name'].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
-            if(tagName.includes(tagSearch)){
-              if(!indexToKeep.includes(i)){
-                indexToKeep.push(i)
-              }
+      for (var i = 0; i < size; i++) {
+        var listTagProject = (
+          await this.getProjectByTag_aux(this.projectsQuery[i])
+        ).data;
+
+        for (var j = 0; j < listTagProject.length; j++) {
+          var tagName = listTagProject[j]["name"]
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase();
+          if (tagName.includes(tagSearch)) {
+            if (!indexToKeep.includes(i)) {
+              indexToKeep.push(i);
             }
-
           }
         }
+      }
 
-        var projectbytags = indexToKeep.map(j => this.projectsQuery[j]);
-        return projectbytags
+      var projectbytags = indexToKeep.map((j) => this.projectsQuery[j]);
+      return projectbytags;
     },
   },
 };
