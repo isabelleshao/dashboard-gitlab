@@ -1,7 +1,7 @@
 <template>
     <div class = "issues">
         <div class = "rightsided">
-            <a target="_blank" v-bind:href='this.project.web_url+"/-/issues"'>
+            <a target="_blank" v-bind:href='this.project.web_url+"/-/issues"' v-if="this.project.open_issues_count > 0">
                 <div class = "container_issues">
                     <img class = "issue_icon" src='../../../../public/issue.png' alt = "paper image"/>
                     
@@ -22,6 +22,8 @@
 
 
 <script>
+import axios from "axios";
+
     export default {
         name: "Issues",
         components:{
@@ -30,7 +32,7 @@
 
         data(){
             return{
-
+                issues: [],
             }
         },
         methods:{
@@ -38,6 +40,26 @@
         },
 
         created(){
+            if(this.project.issues){
+                this.issues = this.project.issues
+            }
+            else{
+                // Load members of project
+                axios.get(this.project._links.issues,{
+                headers: {
+                    'Access-Control-Allow-Origin': 'GET',
+                    'Content-Type': 'application/json',
+                    "PRIVATE-TOKEN" : this.$props.token
+                }
+                })
+                .then((res) => {
+                    this.issues = res.data
+                    this.$emit("loadedIssues", this.issues)
+                })
+                .catch((error) => {
+                console.error(error)
+                })
+            }
         },
     }
 </script>
@@ -72,6 +94,7 @@ a{
     color: black;
     text-align: center;
     align-items: center;
+    margin-bottom:1em;
 }
 
 .container_issues:hover{
@@ -98,7 +121,6 @@ a{
 .container_create{
     display: inline-flex;
     width: 100%;
-    margin-top: 0.5em;
     cursor: pointer;
     color: black;
     align-items: center;
@@ -112,7 +134,8 @@ a{
 
 .create_text{
     margin: auto;
-    margin-right: 1em
+    margin-right: 1em;
+    margin-left:0.25em;
 }
 
 

@@ -11,6 +11,10 @@
         v-bind:projects="projectsQuery"
         v-bind:token="this.token" 
         v-bind:reset="this.reset"
+        @loadedMembersProjectList="loadMembersApp"
+        @loadedTagsProjectList="loadTagsApp" 
+        @loadedPipelinesProjectList="loadPipelinesApp" 
+        @loadedIssuesProjectList="loadIssuesApp"
         v-if="isLoaded & !GroupIsNotSelected"/>
       <ProjectList 
         v-bind:projects="projects" 
@@ -18,6 +22,7 @@
         @loadedMembersProjectList="loadMembersApp"
         @loadedTagsProjectList="loadTagsApp" 
         @loadedPipelinesProjectList="loadPipelinesApp" 
+        @loadedIssuesProjectList="loadIssuesApp"
         v-else-if="!GroupIsNotSelected"/>
     </div>
   </div>
@@ -64,7 +69,6 @@ export default {
     projects: function(newVal) {
 
       var projectTitleToDisplay = []
-      console.log(this.filterTitle)
       if(this.filterTitle.length > 0){
           for(var proj of newVal){
             var toAdd = true
@@ -110,6 +114,13 @@ export default {
         }
       }
     },
+    loadIssuesApp(id, issues){
+      for(const proj of this.projects){
+        if(proj.id == id){
+          proj.issues = issues
+        }
+      }
+    },
 
     
 
@@ -134,7 +145,6 @@ export default {
       if(s.user.length > 0){
         this.getProjectByUser(s.user)
         this.isLoaded = true
-        console.log(this.projectsQuery)
       }
       if(s.tag.length > 0){
         this.projectsQuery = await this.getProjectByTag(s.tag)

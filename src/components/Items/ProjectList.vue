@@ -27,9 +27,12 @@ export default {
       loadPipelinesProjectList(id,pipelines){
           this.$emit("loadedPipelinesProjectList",id,pipelines)
       },
+      loadIssuesProjectList(id,issues){
+          this.$emit("loadedIssuesProjectList",id,issues)
+      },
     },
   created(){
-    console.log(this.projects)
+    // console.log(this.projects)
   }
 }
 </script>

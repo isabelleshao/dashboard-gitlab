@@ -4,7 +4,9 @@
         <Project v-bind:project="project" v-bind:token="token" 
           @loadedMembersProject="loadMembersProjectList" 
           @loadedTagsProject="loadTagsProjectList"
-          @loadedPipelinesProject="loadPipelinesProjectList"/>
+          @loadedPipelinesProject="loadPipelinesProjectList"
+          @loadedIssuesProject="loadIssuesProjectList"
+          />
     </div>
   </div>
 </template>
@@ -38,7 +40,6 @@ export default {
       this.projectsDisplay = [];
     },
     projects: async function(newVal, oldVal) { // watch it
-        console.log(newVal)
         if(oldVal.length > newVal.length){
           this.indexAt = 0
           this.projectsDisplay = []
@@ -54,8 +55,6 @@ export default {
           this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
           this.indexAt = this.indexAt + projectToAdd
         }
-      
-        console.log(this.projectsDisplay)
     }
   },
 
@@ -86,6 +85,9 @@ export default {
       },
       loadPipelinesProjectList(id,pipelines){
           this.$emit("loadedPipelinesProjectList",id,pipelines)
+      },
+      loadIssuesProjectList(id,issues){
+          this.$emit("loadedIssuesProjectList",id,issues)
       },
     }
 }

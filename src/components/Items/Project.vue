@@ -6,7 +6,7 @@
         </div>
         <Tags v-bind:project="this.project" v-bind:token="token" @loadedTags="loadTagsProject"/>
 
-        <Issues v-bind:project="this.project" v-bind:token="token"/>
+        <Issues v-bind:project="this.project" v-bind:token="token" @loadedIssues="loadIssuesProject"/>
     </div>
 
     <div class = "date">
@@ -69,6 +69,9 @@
             },
             loadPipelinesProject(pipelines){
                 this.$emit("loadedPipelinesProject", this.project.id, pipelines)
+            },
+            loadIssuesProject(issues){
+                this.$emit("loadedIssuesProject", this.project.id, issues)
             },
         },
 
