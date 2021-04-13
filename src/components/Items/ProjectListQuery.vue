@@ -38,6 +38,7 @@ export default {
       this.projectsDisplay = [];
     },
     projects: async function(newVal, oldVal) { // watch it
+        console.log(newVal)
         if(oldVal.length > newVal.length){
           this.indexAt = 0
           this.projectsDisplay = []
@@ -45,14 +46,16 @@ export default {
 
         if(this.indexAt < this.max_projects_display){  
           var projectToAdd = this.max_projects_display
+
           if(newVal.length < this.indexAt + projectToAdd){
             projectToAdd = newVal.length - this.indexAt
           }
-
-          this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
-          this.indexAt = this.indexAt + projectToAdd + 1
-        }
         
+          this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
+          this.indexAt = this.indexAt + projectToAdd
+        }
+      
+        console.log(this.projectsDisplay)
     }
   },
 

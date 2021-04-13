@@ -5,6 +5,8 @@
             <h3 class = "projectName">{{project.name}}</h3>
         </div>
         <Tags v-bind:project="this.project" v-bind:token="token" @loadedTags="loadTagsProject"/>
+
+        <Issues v-bind:project="this.project" v-bind:token="token"/>
     </div>
 
     <div class = "date">
@@ -24,6 +26,7 @@
     import Members from "./ProjectItems/Members"
     import Pipeline from "./ProjectItems/Pipeline"
     import Tags from "./ProjectItems/Tags"
+    import Issues from "./ProjectItems/Issues"
 
     export default {
         name: "Project",
@@ -31,6 +34,7 @@
             Members,
             Pipeline,
             Tags,
+            Issues,
         },
         props: ["project","token"],
 
