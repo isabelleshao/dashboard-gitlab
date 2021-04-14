@@ -17,7 +17,7 @@ export default {
   components: {
     Project
   },
-  props: ["projects","token", "Comments","CommentsProjetID"],
+  props: ["projects","token", "Comments","CommentsProjetID", "upToDate"],
   data(){
     return{
       indexAt: 0,
