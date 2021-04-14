@@ -4,7 +4,9 @@
         <Project v-bind:project="project" v-bind:token="token"  v-bind:Comments="Comments"  v-bind:CommentsProjetID="CommentsProjetID"
           @loadedMembersProject="loadMembersProjectList" 
           @loadedTagsProject="loadTagsProjectList"
-          @loadedPipelinesProject="loadPipelinesProjectList"/>
+          @loadedPipelinesProject="loadPipelinesProjectList"
+          @loadedIssuesProject="loadIssuesProjectList"
+          />
     </div>
   </div>
 </template>
@@ -17,7 +19,7 @@ export default {
   components: {
     Project
   },
-  props: ["projects","token", "Comments","CommentsProjetID", "upToDate"],
+  props: ["projects","token", "Comments","CommentsProjetID", "upToDate", "reset"],
   data(){
     return{
       indexAt: 0,
@@ -34,8 +36,11 @@ export default {
   },
 
   watch: { 
+    reset:function(){
+      this.indexAt = 0;
+      this.projectsDisplay = [];
+    },
     projects: async function(newVal, oldVal) { // watch it
-        console.log(newVal);
         if(oldVal.length > newVal.length){
           this.indexAt = 0
           this.projectsDisplay = []
@@ -43,15 +48,14 @@ export default {
 
         if(this.indexAt < this.max_projects_display){  
           var projectToAdd = this.max_projects_display
+
           if(newVal.length < this.indexAt + projectToAdd){
             projectToAdd = newVal.length - this.indexAt
           }
-
-        // this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
-    this.projectsDisplay = this.projects
-          this.indexAt = this.indexAt + projectToAdd + 1
-        }
         
+          this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
+          this.indexAt = this.indexAt + projectToAdd
+        }
     }
   },
 
@@ -83,7 +87,9 @@ export default {
       loadPipelinesProjectList(id,pipelines){
           this.$emit("loadedPipelinesProjectList",id,pipelines)
       },
- 
+      loadIssuesProjectList(id,issues){
+          this.$emit("loadedIssuesProjectList",id,issues)
+      },
     }
 }
 </script>

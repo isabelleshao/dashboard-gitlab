@@ -22,12 +22,18 @@
         v-bind:Comments="Comments"
         v-bind:CommentsProjetID="CommentsProjetID"
         v-if="isLoaded & !GroupIsNotSelected"
+              v-bind:reset="this.reset"
+        @loadedMembersProjectList="loadMembersApp"
+        @loadedTagsProjectList="loadTagsApp" 
+        @loadedPipelinesProjectList="loadPipelinesApp" 
+        @loadedIssuesProjectList="loadIssuesApp"
       />
       <ProjectList
         v-bind:projects="projects"
         v-bind:token="this.token"
         @loadedMembersProjectList="loadMembersApp"
         @loadedTagsProjectList="loadTagsApp"
+                @loadedIssuesProjectList="loadIssuesApp"
         @loadedPipelinesProjectList="loadPipelinesApp"
         v-else-if="!GroupIsNotSelected"
       />
@@ -59,9 +65,10 @@ export default {
       GroupIsNotSelected: true,
       projects: [],
       filterIn: [],
-
-      projectsQuery: [],
-      token: token.token,
+      
+      reset:0,
+      projectsQuery:[],
+      token:token.token,
       gitlaburl: "https://pstl.algo-prog.info/api/v4",
 
       filterTitle: [],
@@ -74,7 +81,7 @@ export default {
     this.identifierUser();
   },
 
-  watch: {
+watch: {
     projects: function (newVal) {
       var projectTitleToDisplay = [];
       console.log(this.filterTitle);
@@ -241,11 +248,20 @@ export default {
         }
       }
     },
+    loadIssuesApp(id, issues){
+      for(const proj of this.projects){
+        if(proj.id == id){
+          proj.issues = issues
+        }
+      }
+    },
 
     resetsearch() {
-      this.filterTitle = [];
-      this.isLoaded = false;
-      this.projectsQuery = this.projects;
+      this.filterTitle = []
+      if(this.projectsQuery.length != this.projects.length){
+        this.reset = this.reset + 1
+        this.projectsQuery = this.projects
+      }
     },
 
     async addSearch2(s) {
@@ -261,9 +277,9 @@ export default {
         this.projectsQuery = await this.getProjectByUser(s.user);
         this.isLoaded = true;
       }
-      if (s.tag.length > 0) {
-        this.projectsQuery = await this.getProjectByTag(s.tag);
-        this.isLoaded = true;
+      if(s.user.length > 0){
+        this.getProjectByUser(s.user)
+        this.isLoaded = true
       }
 
       /*
@@ -285,9 +301,9 @@ export default {
 
     async addGroupSearch(group) {
       const response = await this.getProjectByGroup(group);
-      const groupProjects = response.data.projects;
-      var projectsToDisplay = [];
-      var per_page = 150;
+      const groupProjects = response.data.projects
+      var projectsToDisplay = []
+      var per_page = 100
 
       for (const proj of groupProjects) {
         axios
@@ -445,79 +461,81 @@ export default {
     },
 
     async getProjectByUser(strMember) {
-      var userSearch = strMember.toUpperCase();
-      var indexToKeep = [];
+        var userSearch = strMember.toUpperCase()
+        
+        var projectTemp = this.projectsQuery
+        this.projectsQuery = [];
 
-      const size = this.projectsQuery.length;
 
-      for (var i = 0; i < size; i++) {
-        var listUserProject = (
-          await this.getProjectByUser_aux(this.projectsQuery[i])
-        ).data;
-        for (var k = 0; k < listUserProject.length; k++) {
-          var userUsername = listUserProject[k]["name"]
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .toUpperCase();
-          var userName = listUserProject[k]["username"]
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .toUpperCase();
+        const size = projectTemp.length
+        for(var i = 0; i < size ; i++){ 
+          var listUserProject 
+          if(!projectTemp[i].members){
+            listUserProject = (await this.getProjectByUser_aux(projectTemp[i])).data;
+            projectTemp[i].members = listUserProject
+            this.loadMembersApp(projectTemp[i].id, listUserProject)
+          }else{
+            listUserProject = projectTemp[i].members;
+          }
+          for (var k = 0; k < listUserProject.length; k++) {
+            var userUsername = listUserProject[k]['name'].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
+            var userName = listUserProject[k]['username'].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
 
-          if (
-            userName.includes(userSearch) ||
-            userUsername.includes(userSearch)
-          ) {
-            indexToKeep.push(i);
+            if(userName.includes(userSearch) || userUsername.includes(userSearch)){
+              this.reset += 1;
+              this.projectsQuery.push(projectTemp[i])
+            }
           }
         }
-      }
-      var projectbyusers = indexToKeep.map((j) => this.projectsQuery[j]);
-      return projectbyusers;
     },
 
     ////////////////////////////////////////////////////
     getProjectByTag_aux(proj) {
       //pour chaque projet, recupère la liste des membres et la renvoit
-      return axios.get(proj._links.self + "/repository/tags", {
-        headers: {
-          "Access-Control-Allow-Origin": "GET",
-          "Content-Type": "application/json",
-          "PRIVATE-TOKEN": this.token,
-        },
-      });
+      return axios
+      .get(proj._links.self + "/repository/tags",{
+            headers: {
+                'Access-Control-Allow-Origin': 'GET',
+                'Content-Type': 'application/json',
+                "PRIVATE-TOKEN" : this.token
+            }
+      })
     },
 
     async getProjectByTag(strTag) {
-      var tagSearch = strTag.toUpperCase();
-      var indexToKeep = [];
+        var tagSearch = strTag.toUpperCase()
+        var indexToKeep = []
 
-      const size = this.projectsQuery.length;
+        const size = this.projectsQuery.length
 
-      for (var i = 0; i < size; i++) {
-        var listTagProject = (
-          await this.getProjectByTag_aux(this.projectsQuery[i])
-        ).data;
+        for(var i = 0; i < size ; i++){ 
+          var listTagProject 
+          if(!this.projectsQuery[i].tags){
+            listTagProject = (await this.getProjectByTag_aux(this.projectsQuery[i])).data;
+            this.projectsQuery[i].tags = listTagProject
+            this.loadMembersApp(this.projectsQuery[i].id, listTagProject)
+          }else{
+            listTagProject = this.projectsQuery[i].tags;
+          }
 
-        for (var j = 0; j < listTagProject.length; j++) {
-          var tagName = listTagProject[j]["name"]
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .toUpperCase();
-          if (tagName.includes(tagSearch)) {
-            if (!indexToKeep.includes(i)) {
-              indexToKeep.push(i);
+          for(var j = 0; j < listTagProject.length; j++){
+            var tagName = listTagProject[j]['name'].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
+            if(tagName.includes(tagSearch)){
+              if(!indexToKeep.includes(i)){
+                indexToKeep.push(i)
+              }
             }
+
           }
         }
-      }
 
-      var projectbytags = indexToKeep.map((j) => this.projectsQuery[j]);
-      return projectbytags;
+        var projectbytags = indexToKeep.map(j => this.projectsQuery[j]);
+        return projectbytags
     },
   },
 };
 </script>
+
 
 <style>
 * {
