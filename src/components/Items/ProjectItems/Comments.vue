@@ -1,40 +1,20 @@
 <template>
   <div class="Comments">
-     <div :id="this.project.id">
-{{upToDateCommentaire() }}</div>
-    <div class="hrefWraper">
-      <div class="box">
+     <div :id="this.project.id">{{upToDateCommentaire() }}</div>
+      <div class="hrefWraper box">
+
         <div class="wrapper">
           <textarea
             name="perso"
             id=""
             rows="10"
             v-bind:value="this.displayCommentaires1()"
-            ref="note1"
-          >
-          </textarea>
-          <div class="controls">
-            <button @click="updateCommentaire1()" ref="bouton1">
+            ref="note1"/>
+
+            <button class="controls" @click="updateCommentaire1()" ref="bouton1">
               Enregistrer commentaires perso
             </button>
-          </div>
         </div>
-
-        <div class="wrapper">
-          <textarea
-            name="somename"
-            id=""
-            rows="10"
-            v-bind:value="this.displayCommentaires2()"
-            ref="note2"
-          ></textarea>
-          <div class="controls">
-            <button @click="updateCommentaire2()" ref="bouton2">
-              Envoyer à l'élève les commentaires
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -138,61 +118,6 @@ return "corrigé!"
           console.log("AXIOS ERROR: ", err);
         });
     },
-
-    updateCommentaire2() {
-      let value = this.$refs.note2.value;
-      let commentaireExistant = false;
-
-      // check s'il faut ecraser un commentaire
-      for (let i = 0; i < this.Comments.length; i++) {
-        if (this.project.id == this.Comments[i].idProjet) {
-          this.Comments[i].note2 = value;
-          (this.Comments[i].lastCommit = this.project.last_activity_at),
-            (commentaireExistant = true);
-        }
-      }
-      //  si l'entrée n'est pas definie, creer l'entrée
-      if (!commentaireExistant) {
-        this.Comments.push({
-          idProjet: this.project.id,
-          note1: this.note1,
-          note2: value,
-          lastCommit: this.project.last_activity_at,
-        });
-      }
-
-      var postD = {
-        branch: "master",
-        content: JSON.stringify(this.Comments),
-        commit_message: "Update notes",
-      };
-
-      let axiosConfig = {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "PRIVATE-TOKEN": this.$props.token,
-        },
-      };
-
-      axios
-        .put(
-          "https://pstl.algo-prog.info/api/v4/projects/" +
-            this.CommentsProjetID +
-            "/repository/files/notes.json",
-          postD,
-          axiosConfig
-        )
-        .then((res) => {
-          this.$refs.bouton2.classList.value =this.$refs.bouton2.classList.value + "uptodate";
-          this.$refs.bouton2.getAnimations.
-          alert("commentaire posté!");
-          console.log("RESPONSE RECEIVED: ", res);
-        })
-        .catch((err) => {
-          console.log("AXIOS ERROR: ", err);
-        });
-    },
   },
 
   created() {},
@@ -259,7 +184,7 @@ p {
   outline: none;
 }
 .controls {
-  text-align: right;
+  text-align: center;
   margin-top: -6px;
 }
 button {
