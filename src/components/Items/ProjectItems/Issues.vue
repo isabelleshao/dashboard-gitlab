@@ -1,7 +1,7 @@
 <template>
     <div class = "issues">
         <div class = "rightsided">
-            <a target="_blank" v-bind:href='this.project.web_url+"/-/issues"' v-if="this.project.open_issues_count > 0">
+            <a target="_blank" v-bind:href='this.project.web_url+"/-/issues?order_by=updated_at"' v-if="this.project.open_issues_count > 0">
                 <div class = "container_issues">
                     <img class = "issue_icon" src='../../../../public/issue.png' alt = "paper image"/>
                     
