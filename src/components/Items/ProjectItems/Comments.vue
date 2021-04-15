@@ -1,20 +1,20 @@
 <template>
   <div class="Comments">
-     <div :id="this.project.id">{{upToDateCommentaire() }}</div>
-      <div class="hrefWraper box">
+    <div :id="this.project.id">{{ upToDateCommentaire() }}</div>
+    <div class="hrefWraper box">
+      <div class="wrapper">
+        <textarea
+          name="perso"
+          id=""
+          rows="10"
+          v-bind:value="this.displayCommentaires1()"
+          ref="note1"
+        />
 
-        <div class="wrapper">
-          <textarea
-            name="perso"
-            id=""
-            rows="10"
-            v-bind:value="this.displayCommentaires1()"
-            ref="note1"/>
-
-            <button class="controls" @click="updateCommentaire1()" ref="bouton1">
-              Enregistrer commentaires perso
-            </button>
-        </div>
+        <button class="controls" @click="updateCommentaire1()" ref="bouton1">
+          Enregistrer commentaires perso
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -23,7 +23,7 @@
 import axios from "axios";
 export default {
   name: "Comments",
-  props: ["Comments", "token", "project", "CommentsProjetID"],
+  props: ["Comments", "token", "project", "CommentsProjetID", "issues"],
 
   data() {
     return {};
@@ -31,16 +31,39 @@ export default {
 
   methods: {
     upToDateCommentaire() {
-      for (var i = 0; i < this.Comments.length; i++) {
+      var dateProjet = new Date(this.project.last_activity_at);
+
+      for (var i = 0; i < this.issues.length; i++) {
+        var dateIssue = new Date(this.issues[i].updated_at);
+
+        console.log("projet:" + dateProjet + " issue: " + dateIssue);
+         console.log("projet:"+dateProjet.getTime()+ " issue: "+dateIssue.getTime())
+
+
+
+
+        console.log(dateProjet + 0 + "  " + dateIssue + 0);
+             console.log(dateIssue >= dateProjet-5000 );
+        console.log("--------");
+   
+
+        if (dateIssue >= dateProjet-5000 && dateIssue <= dateProjet+5000) {
+          return "corrigé!";
+        }
+      }
+
+      return "à corriger";
+
+      /*  for (var i = 0; i < this.Comments.length; i++) {
         if (this.project.id == this.Comments[i].idProjet) {
           if (this.project.last_activity_at == this.Comments[i].lastCommit) {
-
-return "corrigé!"
-           // this.$refs.bouton2.classList.value =  this.$refs.bouton2.classList.value + "uptodate";
+            return "corrigé!";
+            // this.$refs.bouton2.classList.value =  this.$refs.bouton2.classList.value + "uptodate";
           }
         }
       }
-      return "à corriger"
+      return "à corriger";
+      */
     },
 
     displayCommentaires1() {
@@ -50,19 +73,6 @@ return "corrigé!"
         for (var i = 0; i < this.Comments.length; i++) {
           if (this.project.id == this.Comments[i].idProjet) {
             return this.Comments[i].note1;
-          }
-        }
-      }
-    },
-
-    displayCommentaires2() {
-      if (this.Comments.length == 0) {
-        return [];
-      } else {
-        for (var i = 0; i < this.Comments.length; i++) {
-          if (this.project.id == this.Comments[i].idProjet) {
-                  
-            return this.Comments[i].note2;
           }
         }
       }
@@ -113,9 +123,15 @@ return "corrigé!"
         )
         .then((res) => {
           console.log("RESPONSE RECEIVED: ", res);
+          this.$refs.bouton1.classList.value =
+            this.$refs.bouton1.classList.value + "sent";
+          this.$refs.bouton1.textContent = "Commentaire enregistré";
         })
         .catch((err) => {
           console.log("AXIOS ERROR: ", err);
+          this.$refs.bouton1.classList.value =
+            this.$refs.bouton1.classList.value + "error";
+          this.$refs.bouton1.textContent = "Enregistrement echoué";
         });
     },
   },
@@ -125,8 +141,12 @@ return "corrigé!"
 </script>
 
 <style scoped>
-button.uptodate {
+button.sent {
   background-color: #93cf8c;
+}
+
+button.error {
+  background-color: #cf8c95;
 }
 
 .Member {
