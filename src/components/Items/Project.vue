@@ -1,15 +1,13 @@
 <template>
   <div class="project">
-      <div class="cols">
-      <div class="col1">
     <div class = "projectDiv">
         <div class = "hrefProjectwrap" @click="openProjectLink()">
             <h3 class = "projectName">{{project.name}}</h3>
         </div>
         <Tags v-bind:project="this.project" v-bind:token="token" @loadedTags="loadTagsProject"/>
-
         <Issues v-bind:project="this.project" v-bind:token="token" @loadedIssues="loadIssuesProject"/>
     </div>
+    <Comments  v-bind:token="token"   v-bind:CommentsProjetID="CommentsProjetID" v-bind:Comments="Comments" v-bind:project="this.project"/>
 
     <div class = "date">
         <img class = "calendarIcon" src="../../../public//CalendarIcon.png" alt="Calendar image" />
@@ -20,9 +18,6 @@
     
     
     <Pipeline v-bind:project="this.project" v-bind:token="token" @loadedPipelines="loadPipelinesProject"/>
-      </div><div class="col2">
-        <Comments  v-bind:token="token"   v-bind:CommentsProjetID="CommentsProjetID" v-bind:Comments="Comments" v-bind:project="this.project"/></div>
-  </div>
   </div>
 </template>
 
@@ -96,17 +91,12 @@
 <style scoped>
 
 
+    .right-side-panel{
+        display: inline-block;
+        align-items: right;
+        width: 100%;
+    }
 
-.cols {
-  display: flex;
-}
-
-.col1{
-           width: -webkit-fill-available;
-}
-.col2{
-     margin-left: auto;
-}
     .project{
         display: inline-block;
         width: 100%;

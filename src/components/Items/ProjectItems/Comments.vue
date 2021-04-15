@@ -1,8 +1,11 @@
 <template>
-  <div class="Comments">
+  <div class="comments">
      <div :id="this.project.id">{{upToDateCommentaire() }}</div>
-      <div class="hrefWraper box">
-
+      <button class= "button-note" @click="showTextarea()" v-if='!this.showTextareabool'> 
+          <img class = "img-note" src='../../../../public/ecrire note.png' alt = "create note"/>
+          <p class = "text-note"> Ecrire une note </p>
+      </button>
+      <div class="hrefWraper box" v-else>
         <div class="wrapper">
           <textarea
             name="perso"
@@ -15,7 +18,7 @@
               Enregistrer commentaires perso
             </button>
         </div>
-    </div>
+      </div>
   </div>
 </template>
 
@@ -26,10 +29,16 @@ export default {
   props: ["Comments", "token", "project", "CommentsProjetID"],
 
   data() {
-    return {};
+    return {
+      showTextareabool: false,
+    };
   },
 
   methods: {
+
+    showTextarea(){
+      this.showTextareabool = true
+    },
     upToDateCommentaire() {
       for (var i = 0; i < this.Comments.length; i++) {
         if (this.project.id == this.Comments[i].idProjet) {
@@ -124,7 +133,41 @@ return "corrigé!"
 };
 </script>
 
+
+
 <style scoped>
+
+.comments {
+    align-items: right;
+    text-align: right;
+    float: right; 
+    display: inline-block;
+}
+
+.button-note{
+  width:100%;
+  background-color: transparent;
+  border : none;
+  
+
+  display: inline-flex;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border: transparent;
+  border-radius: 5px;
+  color: black;
+  margin-bottom:1em;
+}
+
+.img-note{
+  width: 25px;
+  border-radius: 1px;
+}
+
+.text-note{
+  font-size:15px;
+}
+
 button.uptodate {
   background-color: #93cf8c;
 }
@@ -171,6 +214,7 @@ p {
   border: 1px solid #999;
   width: 200px;
 }
+
 .wrapper textarea {
   background: linear-gradient(to bottom, #e5e5e5 0%, #f2f2f2 100%);
   border: none;
@@ -187,11 +231,5 @@ p {
   text-align: center;
   margin-top: -6px;
 }
-button {
-  border: 1px solid #999;
-  padding: 10px 25px;
-  font-weight: bold;
-  color: rgb(77, 77, 77);
-  border-width: 1px 0 0 1px;
-}
+
 </style>
