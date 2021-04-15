@@ -1,24 +1,33 @@
 <template>
   <div class="comments">
-     <div :id="this.project.id">{{upToDateCommentaire() }}</div>
-      <button class= "button-note" @click="showTextarea()" v-if='!this.showTextareabool'> 
-          <img class = "img-note" src='../../../../public/ecrire note.png' alt = "create note"/>
-          <p class = "text-note"> Ecrire une note </p>
-      </button>
-      <div class="hrefWraper box" v-else>
-        <div class="wrapper">
-          <textarea
-            name="perso"
-            id=""
-            rows="10"
-            v-bind:value="this.displayCommentaires1()"
-            ref="note1"/>
+    <div :id="this.project.id">{{ upToDateCommentaire() }}</div>
+    <button
+      class="button-note"
+      @click="showTextarea()"
+      v-if="!this.showTextareabool"
+    >
+      <img
+        class="img-note"
+        src="../../../../public/ecrire note.png"
+        alt="create note"
+      />
+      <p class="text-note">Ecrire une note</p>
+    </button>
+    <div class="hrefWraper box" v-else>
+      <div class="wrapper">
+        <textarea
+          name="perso"
+          id=""
+          rows="10"
+          v-bind:value="this.displayCommentaires1()"
+          ref="note1"
+        />
 
-            <button class="controls" @click="updateCommentaire1()" ref="bouton1">
-              Enregistrer commentaires perso
-            </button>
-        </div>
+        <button class="controls" @click="updateCommentaire1()" ref="bouton1">
+          Enregistrer commentaires perso
+        </button>
       </div>
+    </div>
   </div>
 </template>
 
@@ -32,15 +41,11 @@ export default {
     return {
       showTextareabool: false,
     };
-
-
   },
 
   methods: {
-
-
-    showTextarea(){
-      this.showTextareabool = true
+    showTextarea() {
+      this.showTextareabool = true;
     },
 
     upToDateCommentaire() {
@@ -49,34 +54,11 @@ export default {
       for (var i = 0; i < this.issues.length; i++) {
         var dateIssue = new Date(this.issues[i].updated_at);
 
-        console.log("projet:" + dateProjet + " issue: " + dateIssue);
-         console.log("projet:"+dateProjet.getTime()+ " issue: "+dateIssue.getTime())
-
-
-
-
-        console.log(dateProjet + 0 + "  " + dateIssue + 0);
-             console.log(dateIssue >= dateProjet-5000 );
-        console.log("--------");
-   
-
-        if (dateIssue >= dateProjet-5000 && dateIssue <= dateProjet+5000) {
+        if (dateIssue >= dateProjet - 5000) {
           return "corrigé!";
         }
       }
-
       return "à corriger";
-
-      /*  for (var i = 0; i < this.Comments.length; i++) {
-        if (this.project.id == this.Comments[i].idProjet) {
-          if (this.project.last_activity_at == this.Comments[i].lastCommit) {
-            return "corrigé!";
-            // this.$refs.bouton2.classList.value =  this.$refs.bouton2.classList.value + "uptodate";
-          }
-        }
-      }
-      return "à corriger";
-      */
     },
 
     displayCommentaires1() {
@@ -154,19 +136,17 @@ export default {
 </script>
 
 <style scoped>
-
 .comments {
-    align-items: right;
-    text-align: right;
-    float: right; 
-    display: inline-block;
+  align-items: right;
+  text-align: right;
+  float: right;
+  display: inline-block;
 }
 
-.button-note{
-  width:100%;
+.button-note {
+  width: 100%;
   background-color: transparent;
-  border : none;
-
+  border: none;
 
   display: inline-flex;
   padding-top: 0.5em;
@@ -174,20 +154,16 @@ export default {
   border: transparent;
   border-radius: 5px;
   color: black;
-  margin-bottom:1em;
+  margin-bottom: 1em;
 }
 
-.img-note{
+.img-note {
   width: 25px;
   border-radius: 1px;
 }
 
-.text-note{
-  font-size:15px;
-}
-
-button.uptodate {
-  background-color: #93cf8c;
+.text-note {
+  font-size: 15px;
 }
 
 .Member {
@@ -249,5 +225,4 @@ p {
   text-align: center;
   margin-top: -6px;
 }
-
 </style>
