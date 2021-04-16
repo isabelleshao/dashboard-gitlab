@@ -102,7 +102,7 @@ export default {
         "loadedIssuesProject",
         this.project.id,
         issues
-      ); /*pas besoin d'emit encore, si?*/
+      ); 
     },
   },
 

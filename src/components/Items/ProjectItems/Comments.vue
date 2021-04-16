@@ -1,6 +1,5 @@
 <template>
   <div class="comments">
-
     <button
       class="button-note"
       @click="showTextarea()"
@@ -11,7 +10,7 @@
         src="../../../../public/ecrire note.png"
         alt="create note"
       />
-      <p class="text-note" >Ecrire une note</p>
+      <p class="text-note">Ecrire une note</p>
     </button>
     <div class="hrefWraper box" v-else>
       <div class="wrapper">
@@ -23,10 +22,20 @@
           ref="note1"
         />
 
-        <button class="controls" @click="updateCommentaire1()" ref="bouton1">
+        <button
+          class="controls"
+          @click="updateCommentaire1(false)"
+          ref="bouton1"
+        >
           Enregistrer commentaires perso
         </button>
       </div>
+    </div>
+
+    <div>
+      <button @click="updateCommentaire1(true)" ref="follow" class="unfollow">
+        {{ displayStatus() }}
+      </button>
     </div>
   </div>
 </template>
@@ -40,6 +49,7 @@ export default {
   data() {
     return {
       showTextareabool: false,
+      unfollow: false,
     };
   },
 
@@ -47,8 +57,6 @@ export default {
     showTextarea() {
       this.showTextareabool = true;
     },
-
-
 
     displayCommentaires1() {
       if (this.Comments.length == 0) {
@@ -62,25 +70,60 @@ export default {
       }
     },
 
-    updateCommentaire1() {
-      let value = this.$refs.note1.value;
+    displayStatus() {
+      for (var i = 0; i < this.Comments.length; i++) {
+        if (this.project.id == this.Comments[i].idProjet) {
+          if (this.Comments[i].unfollow) {
+            this.unfollow = false;
+            return "Suivre le projet";
+          } else {
+            this.unfollow = true;
+            return "Ne plus suivre";
+          }
+        }
+      }
+    },
+
+    updateCommentaire1(source) {
       let commentaireExistant = false;
       // check s'il faut ecraser un commentaire
       for (let i = 0; i < this.Comments.length; i++) {
         if (this.project.id == this.Comments[i].idProjet) {
-          this.Comments[i].note1 = value;
+          if (source) {
+            // si ça provient du bouton unfollow
+            let status = this.Comments[i].unfollow;
+            this.Comments[i].unfollow = !status;
+
+            if (status) {
+              this.displayStatus();
+            }
+          } else {
+            this.Comments[i].note1 = this.$refs.note1.value;
+          }
           this.Comments[i].lastCommit = this.project.last_activity_at;
+
           commentaireExistant = true;
         }
       }
       //  si l'entrée n'est pas definie, creer l'entrée
       if (!commentaireExistant) {
-        this.Comments.push({
-          idProjet: this.project.id,
-          note1: value,
-          note2: this.note2,
-          lastCommit: this.project.last_activity_at,
-        });
+        this.unfollowProject = false;
+
+        if (source) {
+          this.Comments.push({
+            idProjet: this.project.id,
+            note1: "",
+            lastCommit: this.project.last_activity_at,
+            unfollow: true,
+          });
+        } else {
+          this.Comments.push({
+            idProjet: this.project.id,
+            note1: this.$refs.note1.value,
+            lastCommit: this.project.last_activity_at,
+            unfollow: false,
+          });
+        }
       }
 
       var putData = {
@@ -107,15 +150,15 @@ export default {
         )
         .then((res) => {
           console.log("RESPONSE RECEIVED: ", res);
-          this.$refs.bouton1.classList.value =
-            this.$refs.bouton1.classList.value + "sent";
-          this.$refs.bouton1.textContent = "Commentaire enregistré";
+          if (!source) {
+            this.$refs.bouton1.textContent = "Commentaire enregistré";
+          }
         })
         .catch((err) => {
           console.log("AXIOS ERROR: ", err);
-          this.$refs.bouton1.classList.value =
-            this.$refs.bouton1.classList.value + "error";
-          this.$refs.bouton1.textContent = "Enregistrement echoué";
+          if (!source) {
+            this.$refs.bouton1.textContent = "Enregistrement echoué";
+          }
         });
     },
   },
@@ -125,6 +168,23 @@ export default {
 </script>
 
 <style scoped>
+.unfollow {
+  display: inline-flex;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border: transparent;
+  background-color: rgba(202, 202, 202, 0.64);
+  border-radius: 5px;
+  cursor: pointer;
+  color: black;
+  text-align: center;
+  align-items: center;
+  margin-bottom: 1em;
+  font-size: 16px;
+}
+
 .comments {
   align-items: right;
   text-align: right;
