@@ -1,6 +1,6 @@
 <template>
   <div class="comments">
-    <div :id="this.project.id">{{ upToDateCommentaire() }}</div>
+
     <button
       class="button-note"
       @click="showTextarea()"
@@ -11,7 +11,7 @@
         src="../../../../public/ecrire note.png"
         alt="create note"
       />
-      <p class="text-note">Ecrire une note</p>
+      <p class="text-note" >Ecrire une note</p>
     </button>
     <div class="hrefWraper box" v-else>
       <div class="wrapper">
@@ -48,18 +48,7 @@ export default {
       this.showTextareabool = true;
     },
 
-    upToDateCommentaire() {
-      var dateProjet = new Date(this.project.last_activity_at);
 
-      for (var i = 0; i < this.issues.length; i++) {
-        var dateIssue = new Date(this.issues[i].updated_at);
-
-        if (dateIssue >= dateProjet - 5000) {
-          return "corrigé!";
-        }
-      }
-      return "à corriger";
-    },
 
     displayCommentaires1() {
       if (this.Comments.length == 0) {

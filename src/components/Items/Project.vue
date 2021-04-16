@@ -1,23 +1,47 @@
 <template>
   <div class="project">
-    <div class = "projectDiv">
-        <div class = "hrefProjectwrap" @click="openProjectLink()">
-            <h3 class = "projectName">{{project.name}}</h3>
-        </div>
-        <Tags v-bind:project="this.project" v-bind:token="token" @loadedTags="loadTagsProject"/>
-        <Issues v-bind:project="this.project" v-bind:token="token" @loadedIssues="loadIssuesProject"/>
+
+    <div class="gauche">
+    <div class="projectDiv">
+      <div class="hrefProjectwrap" @click="openProjectLink()">
+        <h3 class="projectName">{{ project.name }}</h3>
+      </div>
+      <Tags
+        v-bind:project="this.project"
+        v-bind:token="token"
+        @loadedTags="loadTagsProject"
+      />
     </div>
-    <Comments  v-bind:token="token"   v-bind:issues="issues" v-bind:CommentsProjetID="CommentsProjetID" v-bind:Comments="Comments" v-bind:project="this.project"/>
 
-    <div class = "date">
-        <img class = "calendarIcon" src="../../../public//CalendarIcon.png" alt="Calendar image" />
-        <p class = "datep">Last activity : {{this.date.dateDDMMYY}} at {{this.date.dateTime}}</p>
+    <div class="date">
+      <img
+        class="calendarIcon"
+        src="../../../public//CalendarIcon.png"
+        alt="Calendar image"
+      />
+      <p class="datep">
+        Last activity : {{ this.date.dateDDMMYY }} at {{ this.date.dateTime }}
+      </p>
     </div>
 
-    <Members  v-bind:project="this.project" v-bind:token="token" @loadedMembers="loadMembersProject" />
+    <Members
+      v-bind:project="this.project"
+      v-bind:token="token"
+      @loadedMembers="loadMembersProject"
+    />
 
-
-    <Pipeline v-bind:project="this.project" v-bind:token="token" @loadedPipelines="loadPipelinesProject"/>
+    <Pipeline
+      v-bind:project="this.project"
+      v-bind:token="token"
+      @loadedPipelines="loadPipelinesProject"
+    /></div>
+    <Issues
+      v-bind:project="this.project"
+      v-bind:token="token"
+      @loadedIssues="loadIssuesProject"
+      v-bind:CommentsProjetID="CommentsProjetID"
+      v-bind:Comments="Comments"
+    />
   </div>
 </template>
 
@@ -25,7 +49,7 @@
 import Members from "./ProjectItems/Members";
 import Pipeline from "./ProjectItems/Pipeline";
 import Tags from "./ProjectItems/Tags";
-import Comments from "./ProjectItems/Comments";
+
 import Issues from "./ProjectItems/Issues";
 
 export default {
@@ -34,7 +58,7 @@ export default {
     Members,
     Pipeline,
     Tags,
-    Comments,
+
     Issues,
   },
   props: ["project", "token", "Comments", "CommentsProjetID"],
@@ -74,7 +98,11 @@ export default {
     },
     loadIssuesProject(issues) {
       this.issues = issues;
-      this.$emit("loadedIssuesProject", this.project.id, issues); /*pas besoin d'emit encore, si?*/
+      this.$emit(
+        "loadedIssuesProject",
+        this.project.id,
+        issues
+      ); /*pas besoin d'emit encore, si?*/
     },
   },
 
@@ -83,12 +111,17 @@ export default {
     var dateTime = new Date(this.project.last_activity_at).toLocaleTimeString();
     this.$set(this.date, "dateDDMMYY", date);
     this.$set(this.date, "dateTime", dateTime);
-
   },
 };
 </script>
 
 <style scoped>
+
+.gauche{
+  display: block;
+    width: 80%;
+    float: left;
+}
 .cols {
   display: flex;
 }
@@ -109,77 +142,76 @@ export default {
   margin-top: 1em;
 }
 
-    .right-side-panel{
-        display: inline-block;
-        align-items: right;
-        width: 100%;
-    }
+.right-side-panel {
+  display: inline-block;
+  align-items: right;
+  width: 100%;
+}
 
-    .project{
-        display: inline-block;
-        width: 100%;
-    }
+.project {
+  display: flex;
+  width: 100%;
+}
 
-    .projectDetails{
-        display: inline-block;
-        margin-top: 1em;
-    }
+.projectDetails {
+  display: inline-block;
+  margin-top: 1em;
+}
 
-    .date{
-        margin-left:0.5em;
-        display: inline-flex;
-    }
+.date {
+  margin-left: 0.5em;
+  display: inline-flex;
+}
 
-    .datep{
-        margin: auto;
-        padding: auto;
-        margin-left: 0.5em;
-    }
-    .calendarIcon{
-        margin-top: 1em;
-        width: 2em;
-        margin: auto;
-        padding: auto;
-    }
+.datep {
+  margin: auto;
+  padding: auto;
+  margin-left: 0.5em;
+}
+.calendarIcon {
+  margin-top: 1em;
+  width: 2em;
+  margin: auto;
+  padding: auto;
+}
 
-    .projectDiv{
-        width: 100%;
-        display: inline-flex;
-        margin-bottom: 1em;
-    }
-    .projectName{
-        text-align: center;
-        display: inline-flex;
-        align-items: center;
-    }
-    .hrefProjectwrap{
-        padding: 0.5em;
-        border-radius: 10px;
-        display: inline-flex;
-        cursor: pointer;
-        text-align: center;
-        font-size: 30px;
-    }
-    .hrefProjectwrap:hover{
-        background-color: rgba(202,202,202,0.64);
-        
-    }
+.projectDiv {
+  width: 100%;
+  display: inline-flex;
+  margin-bottom: 1em;
+}
+.projectName {
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+}
+.hrefProjectwrap {
+  padding: 0.5em;
+  border-radius: 10px;
+  display: inline-flex;
+  cursor: pointer;
+  text-align: center;
+  font-size: 30px;
+}
+.hrefProjectwrap:hover {
+  background-color: rgba(202, 202, 202, 0.64);
+}
 
-  .project {
-    background: #f4f4f4;
-    padding: 10px;
-    border-bottom: 1px #ccc dotted;
-  }
-  .is-complete {
-    text-decoration: line-through;
-  }
-  .del {
-    background: #ff0000;
-    color: #fff;
-    border: none;
-    padding: 5px 9px;
-    border-radius: 50%;
-    cursor: pointer;
-    float: right;
-  }
+.project {
+  background: #f4f4f4;
+  padding: 10px;
+  border-bottom: 1px #ccc dotted;
+}
+.is-complete {
+  text-decoration: line-through;
+}
+.del {
+  background: #ff0000;
+  color: #fff;
+  border: none;
+  padding: 5px 9px;
+  border-radius: 50%;
+  cursor: pointer;
+  float: right;
+}
 </style>

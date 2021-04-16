@@ -6,7 +6,8 @@
         v-bind:href="this.project.web_url + '/-/issues'"
         v-if="this.project.open_issues_count > 0"
       >
-        <div class="container_issues">
+        {{ upToDateCommentaire() }}
+        <div class="container_issues" ref="uptoDate">
           <img
             class="issue_icon"
             src="../../../../public/issue.png"
@@ -34,6 +35,14 @@
           <p class="create_text">New Issue</p>
         </div>
       </a>
+
+      <Comments
+        v-bind:token="token"
+        v-bind:issues="issues"
+        v-bind:CommentsProjetID="CommentsProjetID"
+        v-bind:Comments="Comments"
+        v-bind:project="this.project"
+      />
     </div>
   </div>
 </template>
@@ -41,18 +50,36 @@
 
 <script>
 import axios from "axios";
-
+import Comments from "./Comments";
 export default {
   name: "Issues",
-  components: {},
-  props: ["project", "token"],
+  components: { Comments },
+  props: ["project", "token", "Comments", "CommentsProjetID"],
 
   data() {
     return {
       issues: [],
     };
   },
-  methods: {},
+  methods: {
+    upToDateCommentaire() {
+      var dateProjet = new Date(this.project.last_activity_at);
+
+      for (var i = 0; i < this.issues.length; i++) {
+        var dateIssue = new Date(this.issues[i].updated_at);
+
+        if (dateIssue >= dateProjet - 1000) {
+          this.$refs.uptoDate.classList.value =
+            this.$refs.uptoDate.classList.value + " uptodate";
+          return;
+        }
+        if (i == this.issues.length - 1 && !(dateIssue >= dateProjet - 1000)) {
+          this.$refs.uptoDate.classList.value =
+            this.$refs.uptoDate.classList.value + " aCorriger";
+        }
+      }
+    },
+  },
 
   created() {
     if (this.project.issues) {
@@ -131,7 +158,7 @@ a {
 }
 
 .container_create {
-  display: inline-flex;
+  display: flex;
   width: 100%;
   cursor: pointer;
   color: black;
@@ -140,10 +167,13 @@ a {
 
 .create_icon {
   width: 2em;
-  margin: auto;
-  margin-left: 1em;
 }
-
+.uptodate {
+  background-color: rgba(82, 197, 139, 0.64);
+}
+.aCorriger {
+  background-color: rgba(230, 203, 82, 0.64);
+}
 .create_text {
   margin: auto;
   margin-right: 1em;
