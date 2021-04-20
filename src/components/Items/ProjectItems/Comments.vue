@@ -33,7 +33,12 @@
     </div>
 
     <div>
-      <button @click="updateCommentaire1(true)" ref="follow" class="unfollow">
+      <button
+        @click="updateCommentaire1(true)"
+        ref="follow"
+        class="unfollow"
+        v-on:click="$emit('clickChildBtn')"
+      >
         {{ displayStatus() }}
       </button>
     </div>
@@ -81,7 +86,8 @@ export default {
             return "Ne plus suivre";
           }
         }
-      }         return "Ne plus suivre";
+      }
+      return "Ne plus suivre";
     },
 
     updateCommentaire1(source) {

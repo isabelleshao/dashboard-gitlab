@@ -42,6 +42,7 @@
         v-bind:CommentsProjetID="CommentsProjetID"
         v-bind:Comments="Comments"
         v-bind:project="this.project"
+        v-on:clickChildBtn="updateStatus"
       />
     </div>
   </div>
@@ -58,36 +59,71 @@ export default {
   data() {
     return {
       issues: [],
+      unfollowed: false,
     };
   },
   methods: {
+    updateStatus() {
+      this.unfollowed = !this.unfollowed;
+      if (this.issues.length > 0) {
+        const maRef = this.$refs.uptoDate.classList;
+
+        if (this.unfollowed) {
+          //signifie que le bouton doit passer au vert quoi qu'il arrive
+
+          if (maRef.contains("aCorriger")) maRef.remove("aCorriger");
+          maRef.add("aJour");
+        } else {
+          // si le projet n'est pas à jour, je passe à l'orange
+
+          if (!this.checkStatusAJour() && maRef.contains("aJour")) {
+            maRef.add("aCorriger");
+            maRef.remove("aJour");
+          }
+        }
+      }
+    },
+
+
+
+    checkStatusAJour() {
+      // si la date du last issue > date du last commit
+      var dateProjet = new Date(this.project.last_activity_at);
+      for (var i = 0; i < this.issues.length; i++) {
+        if (new Date(this.issues[i].updated_at) >= dateProjet - 1000)
+          return true;
+      }
+      return false;
+    },
+
+    checkStatusUnfollow() {
+      // si on ne suit plus le projet return true;
+
+      for (var i = 0; i < this.Comments.length; i++) {
+        if (
+          this.Comments[i].idProjet == this.project.id &&
+          this.Comments[i].unfollow
+        )
+          return true;
+      }
+      return false;
+    },
     upToDateCommentaire() {
       if (this.issues.length > 0) {
         const maRef = this.$refs.uptoDate.classList;
-              
-        // check si on follow toujours le projet
-        for (var i = 0; i < this.Comments.length; i++) {
- 
-          if (this.Comments[i].idProjet == this.project.id && this.Comments[i].unfollow){
-            maRef.add("aJour");
-            return;
-          
-          } 
+
+        // check si on follow toujours le projet, si unfollowed -> on est à jour
+        this.unfollowed = this.checkStatusUnfollow();
+        if (this.unfollowed) {
+          this.unfollowed = true;
+          maRef.add("aJour");
+        } else {
+          //  si on follow toujours le projet, checker la date
+          if (this.checkStatusAJour()) maRef.add("aJour");
+
+          //  si aucune condition de rempli, c'est qu'on est pas à jour
+          if (!maRef.contains("aJour")) maRef.add("aCorriger");
         }
-
-
-       //  si on follow toujours le projet, checker la date
-        var dateProjet = new Date(this.project.last_activity_at);
-
-        for ( i = 0; i < this.issues.length; i++) {
-          var dateIssue = new Date(this.issues[i].updated_at);
-
-          if (dateIssue >= dateProjet - 1000) {
-                  maRef.add("aJour");
-          }
-        }
-       //  si aucune condition de rempli, c'est qu'on est pas à jour
-        if (!maRef.contains("aJour")) maRef.add("aCorriger");
       }
     },
   },
