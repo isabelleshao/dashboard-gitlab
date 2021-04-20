@@ -81,7 +81,7 @@ export default {
             return "Ne plus suivre";
           }
         }
-      }
+      }         return "Ne plus suivre";
     },
 
     updateCommentaire1(source) {

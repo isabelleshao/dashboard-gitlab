@@ -62,20 +62,32 @@ export default {
   },
   methods: {
     upToDateCommentaire() {
-      var dateProjet = new Date(this.project.last_activity_at);
-
-      for (var i = 0; i < this.issues.length; i++) {
-        var dateIssue = new Date(this.issues[i].updated_at);
-
-        if (dateIssue >= dateProjet - 1000) {
-          this.$refs.uptoDate.classList.value =
-            this.$refs.uptoDate.classList.value + " uptodate";
-          return;
+      if (this.issues.length > 0) {
+        const maRef = this.$refs.uptoDate.classList;
+              
+        // check si on follow toujours le projet
+        for (var i = 0; i < this.Comments.length; i++) {
+ 
+          if (this.Comments[i].idProjet == this.project.id && this.Comments[i].unfollow){
+            maRef.add("aJour");
+            return;
+          
+          } 
         }
-        if (i == this.issues.length - 1 && !(dateIssue >= dateProjet - 1000)) {
-          this.$refs.uptoDate.classList.value =
-            this.$refs.uptoDate.classList.value + " aCorriger";
+
+
+       //  si on follow toujours le projet, checker la date
+        var dateProjet = new Date(this.project.last_activity_at);
+
+        for ( i = 0; i < this.issues.length; i++) {
+          var dateIssue = new Date(this.issues[i].updated_at);
+
+          if (dateIssue >= dateProjet - 1000) {
+                  maRef.add("aJour");
+          }
         }
+       //  si aucune condition de rempli, c'est qu'on est pas à jour
+        if (!maRef.contains("aJour")) maRef.add("aCorriger");
       }
     },
   },
@@ -167,7 +179,7 @@ a {
 .create_icon {
   width: 2em;
 }
-.uptodate {
+.aJour {
   background-color: rgba(82, 197, 139, 0.64);
 }
 .aCorriger {
