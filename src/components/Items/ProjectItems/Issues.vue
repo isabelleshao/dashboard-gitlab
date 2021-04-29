@@ -18,7 +18,7 @@
           <div class="number_issues">{{ this.project.open_issues_count }}</div>
         </div>
       </a>
-      <br />
+
       <a
         target="_blank"
         v-bind:href="
@@ -167,7 +167,7 @@ a {
 }
 .issues {
   width: 10%;
-  display: flex;
+  display: inline-flex;
 }
 
 .rightsided {
@@ -190,7 +190,7 @@ a {
   color: black;
   text-align: center;
   align-items: center;
-  margin-bottom: 1em;
+  margin-bottom: 0.5em;
 }
 
 .container_issues:hover {
@@ -214,7 +214,6 @@ a {
 
 .container_create {
   display: flex;
-  width: 100%;
   cursor: pointer;
   color: black;
   align-items: center;
