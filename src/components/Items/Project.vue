@@ -143,7 +143,6 @@ export default {
 .reloadbtn{
   width: 35px;
   height: 35px;
-  margin: 0;
   margin-right: 1em;
   border-radius: 15px;
   border: transparent;
@@ -156,6 +155,8 @@ export default {
   background-color: rgba(101,101,101,0.3);
 }
 .reloadIcon{
+  margin-top: 5px;
+  margin-bottom: 5px;
   width:75%;
 }
 
