@@ -322,7 +322,7 @@ watch: {
             for (var k = 0; k < res.data.length; k++) {
               projectsToDisplay.push(res.data[k]);
             }
-            var totalPages = res.headers["x-total-pages"];
+            var totalPages = res.headers["l-pages"];
             var i;
 
             for (i = 2; i <= totalPages; i++) {
