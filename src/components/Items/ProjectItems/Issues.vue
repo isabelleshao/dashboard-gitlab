@@ -54,7 +54,7 @@ import Comments from "./Comments";
 export default {
   name: "Issues",
   components: { Comments },
-  props: ["project", "token", "Comments", "CommentsProjetID"],
+  props: ["project", "token", "refresh", "Comments", "CommentsProjetID"],
 
   data() {
     return {
@@ -126,30 +126,38 @@ export default {
         }
       }
     },
-  },
-
-  created() {
-    if (this.project.issues) {
-      this.issues = this.project.issues;
-    } else {
-      // Load members of project
-      axios
-        .get(this.project._links.issues, {
-          headers: {
-            "Access-Control-Allow-Origin": "GET",
-            "Content-Type": "application/json",
-            "PRIVATE-TOKEN": this.$props.token,
-          },
-        })
-        .then((res) => {
-          this.issues = res.data;
-          this.$emit("loadedIssues", this.issues);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+    loadDataIssues(){
+      if (this.project.issues) {
+        this.issues = this.project.issues;
+      } else {
+        // Load members of project
+        axios
+          .get(this.project._links.issues, {
+            headers: {
+              "Access-Control-Allow-Origin": "GET",
+              "Content-Type": "application/json",
+              "PRIVATE-TOKEN": this.$props.token,
+            },
+          })
+          .then((res) => {
+            this.issues = res.data;
+            this.$emit("loadedIssues", this.issues);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
     }
   },
+  created(){
+      this.loadDataIssues()
+  },
+
+  watch:{
+      refresh:function(){
+          this.loadDataIssues();
+      }
+  }
 };
 </script>
 
@@ -158,8 +166,8 @@ a {
   text-decoration: none;
 }
 .issues {
-  width: 100%;
-  display: block;
+  width: 10%;
+  display: flex;
 }
 
 .rightsided {

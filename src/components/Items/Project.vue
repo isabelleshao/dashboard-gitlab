@@ -9,8 +9,11 @@
       <Tags
         v-bind:project="this.project"
         v-bind:token="token"
+        v-bind:refresh="this.refresh"
         @loadedTags="loadTagsProject"
       />
+
+      
     </div>
 
     <div class="date">
@@ -27,17 +30,27 @@
     <Members
       v-bind:project="this.project"
       v-bind:token="token"
+      v-bind:refresh="this.refresh"
       @loadedMembers="loadMembersProject"
     />
 
     <Pipeline
       v-bind:project="this.project"
       v-bind:token="token"
+      v-bind:refresh="this.refresh"
       @loadedPipelines="loadPipelinesProject"
     /></div>
+    <button class="reloadbtn" v-on:click="reloadData">
+        <img
+          class="reloadIcon"
+          src="../../../public//reload.png"
+          alt="reload iamge"
+        />
+      </button>
     <Issues
       v-bind:project="this.project"
       v-bind:token="token"
+      v-bind:refresh="this.refresh"
       @loadedIssues="loadIssuesProject"
       v-bind:CommentsProjetID="CommentsProjetID"
       v-bind:Comments="Comments"
@@ -71,6 +84,7 @@ export default {
       tags: [],
       date: {},
       issues: [],
+      refresh: 0,
     };
   },
   methods: {
@@ -104,6 +118,14 @@ export default {
         issues
       ); 
     },
+
+    reloadData(){
+      this.project.members = null
+      this.project.tags = null
+      this.project.issues = null
+      this.project.pipelines = null
+      this.refresh += 1
+    }
   },
 
   created() {
@@ -117,9 +139,35 @@ export default {
 
 <style scoped>
 
+
+.reloadbtn{
+  width: 35px;
+  height: 35px;
+  margin: 0;
+  margin-right: 1em;
+  border-radius: 15px;
+  border: transparent;
+  text-align: center;
+  align-items: center;
+  background-color: rgba(202, 202, 202, 0.64);
+  cursor: pointer;
+}
+.reloadbtn:hover{
+  background-color: rgba(101,101,101,0.3);
+}
+.reloadIcon{
+  width:75%;
+}
+
+.issues{
+  float: right;
+  align: right;
+  align-items: right;
+}
+
 .gauche{
   display: block;
-    width: 80%;
+    width: 90%;
     float: left;
 }
 .cols {
