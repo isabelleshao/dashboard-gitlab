@@ -57,9 +57,7 @@ createQuery(){
 </script>
 
 <style scoped>
-form {
-  /*display: flex;*/
-}
+
 input[type="text"] {
   flex: 10;
   padding: 5px;

@@ -1,0 +1,229 @@
+<template>
+  <div class="issues">
+    <div class="rightsided">
+      <a
+        target="_blank"
+        v-bind:href="this.project.web_url + '/-/issues'"
+        v-if="this.project.open_issues_count > 0"
+      >
+        {{ upToDateCommentaire() }}
+        <div class="container_issues" ref="uptoDate">
+          <img
+            class="issue_icon"
+            src="../../../../public/issue.png"
+            alt="paper image"
+          />
+
+          <div class="btn_issues">Issues</div>
+          <div class="number_issues">{{ this.project.open_issues_count }}</div>
+        </div>
+      </a>
+      <br />
+      <a
+        target="_blank"
+        v-bind:href="
+          this.project.web_url +
+          '/-/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D='
+        "
+      >
+        <div class="container_create">
+          <img
+            class="create_icon"
+            src="../../../../public/create.png"
+            alt="create image"
+          />
+          <p class="create_text">New Issue</p>
+        </div>
+      </a>
+
+      <Comments
+        v-bind:token="token"
+        v-bind:issues="issues"
+        v-bind:CommentsProjetID="CommentsProjetID"
+        v-bind:Comments="Comments"
+        v-bind:project="this.project"
+        v-on:clickChildBtn="updateStatus"
+      />
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+import Comments from "./Comments";
+export default {
+  name: "Issues",
+  components: { Comments },
+  props: ["project", "token", "Comments", "CommentsProjetID"],
+
+  data() {
+    return {
+      issues: [],
+      unfollowed: false,
+    };
+  },
+  methods: {
+    updateStatus() {
+      this.unfollowed = !this.unfollowed;
+      if (this.issues.length > 0) {
+        const maRef = this.$refs.uptoDate.classList;
+
+        if (this.unfollowed) {
+          //signifie que le bouton doit passer au vert quoi qu'il arrive
+
+          if (maRef.contains("aCorriger")) maRef.remove("aCorriger");
+          maRef.add("aJour");
+        } else {
+          // si le projet n'est pas à jour, je passe à l'orange
+
+          if (!this.checkStatusAJour() && maRef.contains("aJour")) {
+            maRef.add("aCorriger");
+            maRef.remove("aJour");
+          }
+        }
+      }
+    },
+
+
+
+    checkStatusAJour() {
+      // si la date du last issue > date du last commit
+      var dateProjet = new Date(this.project.last_activity_at);
+      for (var i = 0; i < this.issues.length; i++) {
+        if (new Date(this.issues[i].updated_at) >= dateProjet - 1000)
+          return true;
+      }
+      return false;
+    },
+
+    checkStatusUnfollow() {
+      // si on ne suit plus le projet return true;
+
+      for (var i = 0; i < this.Comments.length; i++) {
+        if (
+          this.Comments[i].idProjet == this.project.id &&
+          this.Comments[i].unfollow
+        )
+          return true;
+      }
+      return false;
+    },
+    upToDateCommentaire() {
+      if (this.issues.length > 0) {
+        const maRef = this.$refs.uptoDate.classList;
+
+        // check si on follow toujours le projet, si unfollowed -> on est à jour
+        this.unfollowed = this.checkStatusUnfollow();
+        if (this.unfollowed) {
+          this.unfollowed = true;
+          maRef.add("aJour");
+        } else {
+          //  si on follow toujours le projet, checker la date
+          if (this.checkStatusAJour()) maRef.add("aJour");
+
+          //  si aucune condition de rempli, c'est qu'on est pas à jour
+          if (!maRef.contains("aJour")) maRef.add("aCorriger");
+        }
+      }
+    },
+  },
+
+  created() {
+    if (this.project.issues) {
+      this.issues = this.project.issues;
+    } else {
+      // Load members of project
+      axios
+        .get(this.project._links.issues, {
+          headers: {
+            "Access-Control-Allow-Origin": "GET",
+            "Content-Type": "application/json",
+            "PRIVATE-TOKEN": this.$props.token,
+          },
+        })
+        .then((res) => {
+          this.issues = res.data;
+          this.$emit("loadedIssues", this.issues);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  },
+};
+</script>
+
+<style scoped>
+a {
+  text-decoration: none;
+}
+.issues {
+  width: 100%;
+  display: block;
+}
+
+.rightsided {
+  align-items: right;
+  text-align: right;
+  float: right;
+  display: inline-block;
+}
+
+.container_issues {
+  display: inline-flex;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border: transparent;
+  background-color: rgba(202, 202, 202, 0.64);
+  border-radius: 5px;
+  cursor: pointer;
+  color: black;
+  text-align: center;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+.container_issues:hover {
+  background-color: rgba(101, 101, 101, 0.1);
+  text-align: center;
+  align-items: center;
+}
+
+.issue_icon {
+  width: 20px;
+  margin-right: 0.5em;
+}
+
+.number_issues {
+  font-size: 12px;
+  margin-left: 2em;
+  padding: 0.25em;
+  border-radius: 50px;
+  background-color: rgba(101, 101, 101, 0.3);
+}
+
+.container_create {
+  display: flex;
+  width: 100%;
+  cursor: pointer;
+  color: black;
+  align-items: center;
+}
+
+.create_icon {
+  width: 2em;
+}
+.aJour {
+  background-color: rgba(82, 197, 139, 0.64);
+}
+.aCorriger {
+  background-color: rgba(230, 203, 82, 0.64);
+}
+.create_text {
+  margin: auto;
+  margin-right: 1em;
+  margin-left: 0.25em;
+}
+</style>

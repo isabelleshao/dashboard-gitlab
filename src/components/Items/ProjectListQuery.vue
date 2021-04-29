@@ -1,22 +1,25 @@
 <template>
   <div class = "listProject" v-on:scroll="handleScroll">
     <div v-bind:key="project.id" v-for="project in projectsDisplay">
-        <Project v-bind:project="project" v-bind:token="token" 
+        <Project v-bind:project="project" v-bind:token="token"  v-bind:Comments="Comments"  v-bind:CommentsProjetID="CommentsProjetID"
           @loadedMembersProject="loadMembersProjectList" 
           @loadedTagsProject="loadTagsProjectList"
-          @loadedPipelinesProject="loadPipelinesProjectList"/>
+          @loadedPipelinesProject="loadPipelinesProjectList"
+          @loadedIssuesProject="loadIssuesProjectList"
+          />
     </div>
   </div>
 </template>
 
 <script>
 import Project from './Project.vue';
+
 export default {
   name: "ProjectListQuery",
   components: {
     Project
   },
-  props: ["projects","token","reset"],
+  props: ["projects","token", "Comments","CommentsProjetID", "upToDate", "reset"],
   data(){
     return{
       indexAt: 0,
@@ -45,14 +48,14 @@ export default {
 
         if(this.indexAt < this.max_projects_display){  
           var projectToAdd = this.max_projects_display
+
           if(newVal.length < this.indexAt + projectToAdd){
             projectToAdd = newVal.length - this.indexAt
           }
-
-          this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
-          this.indexAt = this.indexAt + projectToAdd + 1
-        }
         
+          this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
+          this.indexAt = this.indexAt + projectToAdd
+        }
     }
   },
 
@@ -83,6 +86,9 @@ export default {
       },
       loadPipelinesProjectList(id,pipelines){
           this.$emit("loadedPipelinesProjectList",id,pipelines)
+      },
+      loadIssuesProjectList(id,issues){
+          this.$emit("loadedIssuesProjectList",id,issues)
       },
     }
 }
