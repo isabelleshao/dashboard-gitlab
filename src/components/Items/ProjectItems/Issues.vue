@@ -6,7 +6,6 @@
         v-bind:href="this.project.web_url + '/-/issues'"
         v-if="this.project.open_issues_count > 0"
       >
-        {{ upToDateCommentaire() }}
         <div class="container_issues" ref="uptoDate">
           <img
             class="issue_icon"
@@ -42,7 +41,7 @@
         v-bind:CommentsProjetID="CommentsProjetID"
         v-bind:Comments="Comments"
         v-bind:project="this.project"
-        v-on:clickChildBtn="updateStatus"
+        v-on:childMessage="updateStatus"
       />
     </div>
   </div>
@@ -59,74 +58,41 @@ export default {
   data() {
     return {
       issues: [],
-      unfollowed: false,
+      estMarqueCommeLu: false,
     };
   },
   methods: {
-    updateStatus() {
-      this.unfollowed = !this.unfollowed;
-      if (this.issues.length > 0) {
+    updateStatus(e) {
+      if (this.$refs.uptoDate !== undefined) {
+        this.estMarqueCommeLu = e;
         const maRef = this.$refs.uptoDate.classList;
-
-        if (this.unfollowed) {
+        if (this.estMarqueCommeLu) {
           //signifie que le bouton doit passer au vert quoi qu'il arrive
 
           if (maRef.contains("aCorriger")) maRef.remove("aCorriger");
           maRef.add("aJour");
         } else {
-          // si le projet n'est pas à jour, je passe à l'orange
-
-          if (!this.checkStatusAJour() && maRef.contains("aJour")) {
-            maRef.add("aCorriger");
+          //je passe à l'orange
+          if (maRef.contains("aJour")) {
             maRef.remove("aJour");
           }
+          maRef.add("aCorriger");
         }
       }
     },
 
-
-
-    checkStatusAJour() {
-      // si la date du last issue > date du last commit
-      var dateProjet = new Date(this.project.last_activity_at);
-      for (var i = 0; i < this.issues.length; i++) {
-        if (new Date(this.issues[i].updated_at) >= dateProjet - 1000)
-          return true;
-      }
-      return false;
-    },
-
-    checkStatusUnfollow() {
-      // si on ne suit plus le projet return true;
-
-      for (var i = 0; i < this.Comments.length; i++) {
-        if (
-          this.Comments[i].idProjet == this.project.id &&
-          this.Comments[i].unfollow
-        )
-          return true;
-      }
-      return false;
-    },
-    upToDateCommentaire() {
+    miseAJourCommentaire() {
       if (this.issues.length > 0) {
-        const maRef = this.$refs.uptoDate.classList;
-
-        // check si on follow toujours le projet, si unfollowed -> on est à jour
-        this.unfollowed = this.checkStatusUnfollow();
-        if (this.unfollowed) {
-          this.unfollowed = true;
+        const maRef = this.$refs.uptoDate.classList.add("aJour");
+        if (this.estMarqueCommeLu) {
           maRef.add("aJour");
         } else {
-          //  si on follow toujours le projet, checker la date
-          if (this.checkStatusAJour()) maRef.add("aJour");
-
-          //  si aucune condition de rempli, c'est qu'on est pas à jour
-          if (!maRef.contains("aJour")) maRef.add("aCorriger");
+          maRef.add("aCorriger");
         }
       }
     },
-    loadDataIssues(){
+
+    loadDataIssues() {
       if (this.project.issues) {
         this.issues = this.project.issues;
       } else {
@@ -144,20 +110,20 @@ export default {
             this.$emit("loadedIssues", this.issues);
           })
           .catch((error) => {
-            console.error(error);
+            console.error(this.project.id + " " + error);
           });
       }
-    }
+    },
   },
-  created(){
-      this.loadDataIssues()
+  created() {
+    this.loadDataIssues();
   },
 
-  watch:{
-      refresh:function(){
-          this.loadDataIssues();
-      }
-  }
+  watch: {
+    refresh: function () {
+      this.loadDataIssues();
+    },
+  },
 };
 </script>
 

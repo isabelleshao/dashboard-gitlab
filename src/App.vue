@@ -37,6 +37,8 @@
         @loadedPipelinesProjectList="loadPipelinesApp"
         v-else-if="!GroupIsNotSelected"
       />
+<br>
+            
     </div>
   </div>
 </template>
@@ -58,6 +60,7 @@ export default {
     FilterPanel,
     ProjectListQuery,
     GroupSelection,
+ 
   },
   data() {
     return {

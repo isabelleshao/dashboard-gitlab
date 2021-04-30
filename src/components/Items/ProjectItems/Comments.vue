@@ -18,15 +18,11 @@
           name="perso"
           id=""
           rows="10"
-          v-bind:value="this.displayCommentaires1()"
+          v-bind:value="this.chargerCommentaire()"
           ref="note1"
         />
 
-        <button
-          class="controls"
-          @click="updateCommentaire1(false)"
-          ref="bouton1"
-        >
+        <button class="controls" @click="updateJSON(3)" ref="bouton1">
           Enregistrer commentaires perso
         </button>
       </div>
@@ -34,12 +30,20 @@
 
     <div>
       <button
-        @click="updateCommentaire1(true)"
+        @click="updateJSON(1)"
         ref="follow"
         class="unfollow"
-        v-on:click="$emit('clickChildBtn')"
+        
       >
-        {{ displayStatus() }}
+        {{ displaySuivi() }}
+      </button>
+      <button
+        @click="updateJSON(2)"
+        ref="read"
+        class="unfollow"
+        
+      >
+        {{ displayMarquerLu() }}
       </button>
     </div>
   </div>
@@ -53,85 +57,128 @@ export default {
 
   data() {
     return {
+      // ENTRÉE VIERGE
       showTextareabool: false,
       unfollow: false,
+      dateLu: new Date("1970-01-01Z00:00:00:000"),
+      estAJour: false,
+      estExistant: false, // doit-on creer une nouvelle entrée JSON ou ecraser une entrée JSON
+      commentaire: "", //format string
     };
   },
 
   methods: {
+    /*trois sources d'entrée: 
+  1 : ne plus suivre
+  2 : marquer lu 
+  3 : ajout d'une note personnelle
+  4 : ajout d'une notation */
+
     showTextarea() {
       this.showTextareabool = true;
     },
 
-    displayCommentaires1() {
-      if (this.Comments.length == 0) {
-        return [];
-      } else {
-        for (var i = 0; i < this.Comments.length; i++) {
-          if (this.project.id == this.Comments[i].idProjet) {
-            return this.Comments[i].note1;
-          }
-        }
-      }
+    chargerCommentaire() {
+      return this.commentaire != null ? this.commentaire : "";
     },
 
-    displayStatus() {
+    displaySuivi() {
+      return this.unfollow ? "Suivre le projet" : "Ne plus suivre";
+    },
+
+    displayMarquerLu() {
+      /* Statut vert : 
+          "clic sur le bouton lu" || clic sur ne plus suivre
+
+          Statut orange
+
+          Si projet toujours suivi : 
+          si la date du dernier "lu" est antérieure à la date du dernier commit 
+          ET qu'on suiçt toujours le projet
+          */
+
+      return this.estAJour ? "Marquer non lu" : "Marquer  lu";
+    },
+
+    updateJSON(source) {
+      /* sources d'entrée: 
+  1 : ne plus suivre
+  2 : marquer lu 
+  3 : ajout d'une note personnelle
+  4 : ajout d'une notation */
+      /////////////////////// DEBUT UPDATE VAR LOCALE
+      if (source == 1) {
+        // si ça provient du bouton de suivi
+        this.unfollow = !this.unfollow;
+        this.estAJour =
+          this.unfollow ||
+          this.dateLu >= this.project.last_activity_at;
+      }
+      if (source == 2) {
+        // si ça provient du bouton de "marquer comme lu"
+        this.estAJour = !this.estAJour;
+
+        if (this.estAJour) {
+          // recuperation de la date actuelle
+          var d = JSON.stringify(new Date()); //UTC0
+          d = new Date(JSON.parse(d)); //UTC+2
+          this.dateLu = d;
+        } else {
+          this.dateLu = new Date("1970-01-01Z00:00:00:000");
+        }
+      }
+
+      if(source==3){
+         // si ca provient du textarea des commentaires
+            this.commentaire = this.$refs.note1.value;
+      }
+      /////////////////////// FIN UPDATE VAR LOCALE
+
+///////////////// DEBUT CREATION VAR TEMP 
+
+      // recuperation des membres du projet
+      var membres = [];
+      this.project.members.forEach((element) => {
+        membres.push({
+          etudiantID: element.id,
+          etudiantName: element.name,
+          etudiantNumber: element.username, // a priori le pseudo c'est le num etudiant
+        });
+      });
+
+
+///////////////// DEBUT UPDATE OBJET COMMENTS 
+      //  si l'entrée n'est pas definie, creer l'entrée
+      if (!this.estExistant) {
+          this.Comments.push({
+            idProjet: this.project.id,
+            note1: this.commentaire,
+            unfollow: this.unfollow,
+            link: this.project._links.self,
+            groupe: this.project.forked_from_project.name_with_namespace,
+            etudiants: membres,
+            lu: this.dateLu,
+            estAjour: this.estAJour
+          });
+          this.estExistant= !this.estExistant;
+      }else{
       for (var i = 0; i < this.Comments.length; i++) {
         if (this.project.id == this.Comments[i].idProjet) {
-          if (this.Comments[i].unfollow) {
-            this.unfollow = false;
-            return "Suivre le projet";
-          } else {
-            this.unfollow = true;
-            return "Ne plus suivre";
-          }
+          console.log("test")
+           // this.Comments[i].idProjet= this.project.id,
+            this.Comments[i].note1= this.commentaire,
+            this.Comments[i].unfollow= this.unfollow,
+           // this.Comments[i].link= this.project._links.self,
+           // this.Comments[i].groupe= this.project.forked_from_project.name_with_namespace,
+            this.Comments[i].etudiants= membres,
+            this.Comments[i].lu= this.dateLu,
+            this.Comments[i].estAjour= this.estAJour
+
         }
       }
-      return "Ne plus suivre";
-    },
-
-    updateCommentaire1(source) {
-      let commentaireExistant = false;
-      // check s'il faut ecraser un commentaire
-      for (let i = 0; i < this.Comments.length; i++) {
-        if (this.project.id == this.Comments[i].idProjet) {
-          if (source) {
-            // si ça provient du bouton unfollow
-            let status = this.Comments[i].unfollow;
-            this.Comments[i].unfollow = !status;
-
-            if (status) {
-              this.displayStatus();
-            }
-          } else {
-            this.Comments[i].note1 = this.$refs.note1.value;
-          }
-          this.Comments[i].lastCommit = this.project.last_activity_at;
-
-          commentaireExistant = true;
-        }
-      }
-      //  si l'entrée n'est pas definie, creer l'entrée
-      if (!commentaireExistant) {
-        this.unfollowProject = false;
-
-        if (source) {
-          this.Comments.push({
-            idProjet: this.project.id,
-            note1: "",
-            lastCommit: this.project.last_activity_at,
-            unfollow: true,
-          });
-        } else {
-          this.Comments.push({
-            idProjet: this.project.id,
-            note1: this.$refs.note1.value,
-            lastCommit: this.project.last_activity_at,
-            unfollow: false,
-          });
-        }
       }
 
+///////////////// DEBUT POST JSON
       var putData = {
         branch: "master",
         content: JSON.stringify(this.Comments),
@@ -166,10 +213,32 @@ export default {
             this.$refs.bouton1.textContent = "Enregistrement echoué";
           }
         });
-    },
+   //////////////nforme le parent 
+         this.$emit('childMessage', this.estAJour); 
+         },
   },
 
-  created() {},
+  created() {
+    if (this.Comments.length == 0) {
+      return [];
+    } else {
+      for (var i = 0; i < this.Comments.length; i++) {
+        if (this.project.id == this.Comments[i].idProjet) {
+          this.estExistant = true;
+          this.estAJour =
+            this.Comments[i].unfollow ||
+            this.Comments[i].lu >= this.project.last_activity_at;
+          this.dateLu = this.Comments[i].lu;
+          this.unfollow = this.Comments[i].unfollow;
+          this.commentaire = this.Comments[i].note1;
+        }
+      }
+       //////////////nforme le parent 
+                console.log("j'emets"+ this.estAJour)
+         this.$emit('childMessage', this.estAJour); 
+
+         }
+  },
 };
 </script>
 
