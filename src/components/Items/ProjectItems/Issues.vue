@@ -132,14 +132,14 @@ a {
   text-decoration: none;
 }
 .issues {
-  width: 10%;
+  width: 20%;
   display: inline-flex;
 }
 
 .rightsided {
-  align-items: right;
-  text-align: right;
-  float: right;
+align-items: right;
+    /*text-align: right;
+  float: right;*/
   display: inline-block;
 }
 

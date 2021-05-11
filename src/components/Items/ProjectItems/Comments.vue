@@ -19,7 +19,7 @@
           id=""
           rows="10"
           v-bind:value="this.chargerCommentaire()"
-          ref="note1"
+          ref="commentaire"
         />
 
         <button class="controls" @click="updateJSON(3)" ref="bouton1">
@@ -27,6 +27,13 @@
         </button>
       </div>
     </div>
+    <div class="notation">
+<input     v-bind:value="this.chargerNote()" ref="notation" type="text" placeholder="Notes">
+
+        <button class="notationbtn" @click="updateJSON(4)" ref="bouton2">
+          Ok
+        </button>
+      </div>
 
     <div>
       <button
@@ -64,6 +71,7 @@ export default {
       estAJour: false,
       estExistant: false, // doit-on creer une nouvelle entrée JSON ou ecraser une entrée JSON
       commentaire: "", //format string
+      notation: "",
     };
   },
 
@@ -80,6 +88,9 @@ export default {
 
     chargerCommentaire() {
       return this.commentaire != null ? this.commentaire : "";
+    },
+        chargerNote() {
+      return this.notation != null ? this.notation : "";
     },
 
     displaySuivi() {
@@ -130,7 +141,11 @@ export default {
 
       if(source==3){
          // si ca provient du textarea des commentaires
-            this.commentaire = this.$refs.note1.value;
+            this.commentaire = this.$refs.commentaire.value;
+      }
+            if(source==4){
+         // si ca provient du textarea des commentaires
+            this.notation = this.$refs.notation.value;
       }
       /////////////////////// FIN UPDATE VAR LOCALE
 
@@ -152,7 +167,8 @@ export default {
       if (!this.estExistant) {
           this.Comments.push({
             idProjet: this.project.id,
-            note1: this.commentaire,
+            commentaire: this.commentaire,
+            notation : this.notation,
             unfollow: this.unfollow,
             link: this.project._links.self,
             groupe: this.project.forked_from_project.name_with_namespace,
@@ -166,13 +182,14 @@ export default {
         if (this.project.id == this.Comments[i].idProjet) {
           console.log("test")
            // this.Comments[i].idProjet= this.project.id,
-            this.Comments[i].note1= this.commentaire,
+            this.Comments[i].commentaire= this.commentaire,
             this.Comments[i].unfollow= this.unfollow,
            // this.Comments[i].link= this.project._links.self,
            // this.Comments[i].groupe= this.project.forked_from_project.name_with_namespace,
             this.Comments[i].etudiants= membres,
             this.Comments[i].lu= this.dateLu,
-            this.Comments[i].estAjour= this.estAJour
+            this.Comments[i].estAjour= this.estAJour,
+             this.Comments[i].notation= this.notation
 
         }
       }
@@ -230,7 +247,8 @@ export default {
             this.Comments[i].lu >= this.project.last_activity_at;
           this.dateLu = this.Comments[i].lu;
           this.unfollow = this.Comments[i].unfollow;
-          this.commentaire = this.Comments[i].note1;
+          this.commentaire = this.Comments[i].commentaire;
+          this.notation = this.Comments[i].notation;
         }
       }
        //////////////nforme le parent 
@@ -261,12 +279,41 @@ export default {
 }
 
 .comments {
-  align-items: right;
+   /* align-items: right;
   text-align: right;
   float: right;
-  display: inline-block;
+display: inline-block;*/
+}
+.notation{
+   display: flex;
+  justify-content: space-between;
 }
 
+input[type=text] {
+  width: 70%;
+  padding: 10px 10px;
+  margin: 8px 0;
+  box-sizing: border-box;
+
+}
+
+.notationbtn{
+  display: inline-flex;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border: transparent;
+  background-color: rgba(202, 202, 202, 0.64);
+  border-radius: 5px;
+  cursor: pointer;
+  color: black;
+  text-align: center;
+  align-items: center;
+  margin-bottom: 7px;
+    margin-top: 7px;
+  font-size: 16px;
+}
 .button-note {
   width: 100%;
   background-color: transparent;
@@ -310,11 +357,11 @@ div.hrefWraper:hover {
 img {
   border-radius: 50%;
   width: 25%;
-  float: left;
+  /*float: left;*/
   margin-top: 0.25em;
 }
 p {
-  margin: auto;
+ /* margin: auto;*/
   padding: 0.5em;
   display: inline-block;
 }
