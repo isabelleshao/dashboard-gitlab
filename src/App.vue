@@ -2,23 +2,42 @@
   <div>
     <Header />
 
-    <div class="flexContainer">
+    <div class="popup" v-if="!isLogged">
+      <h1 class = "loginh1"> Se connecter </h1>
+      <form @submit.prevent="login">
+        <div class = "inputholder">
+          <label for="userurl"> Gitlab URL </label>
+          <input class = "inputlogin" type="text" v-model="userurl" required name="userurl" placeholder="" />
+          <br />
+        </div>
+        <div class = "inputholder">
+          <label for="usertoken"> Token </label>
+          <input class = "inputlogin" required type="password" v-model="usertoken" name="usertoken" placeholder=""/><br />    
+          <br/>
+        </div>
+        <div class="btnholder">
+          <input class = "btnlogin" type="submit" value="Se connecter" />
+        </div>
+      </form>
+    </div>
+
+    <div class="flexContainer" v-else>
       <FilterPanel
         @new-search="addSearch2"
         @resetsearch="resetsearch"
-        v-bind:token="this.token"
+        v-bind:token="this.usertoken"
       />
 
       <GroupSelection
         v-bind:gitlaburl="this.gitlaburl"
-        v-bind:token="this.token"
+        v-bind:token="this.usertoken"
         v-if="GroupIsNotSelected"
         @addGroupSearch="addGroupSearch"
       />
 
       <ProjectListQuery
         v-bind:projects="projectsQuery"
-        v-bind:token="this.token"
+        v-bind:token="this.usertoken"
         v-bind:Comments="Comments"
         v-bind:CommentsProjetID="CommentsProjetID"
         v-if="isLoaded & !GroupIsNotSelected"
@@ -30,7 +49,7 @@
       />
       <ProjectList
         v-bind:projects="projects"
-        v-bind:token="this.token"
+        v-bind:token="this.usertoken"
         @loadedMembersProjectList="loadMembersApp"
         @loadedTagsProjectList="loadTagsApp"
                 @loadedIssuesProjectList="loadIssuesApp"
@@ -47,7 +66,6 @@ import ProjectList from "./components/Items/ProjectList";
 import ProjectListQuery from "./components/Items/ProjectListQuery";
 import FilterPanel from "./components/FilterPanel/FilterPanel";
 import GroupSelection from "./components/GroupSelection/GroupSelection";
-import token from "../token.json";
 import axios from "axios";
 
 export default {
@@ -61,6 +79,7 @@ export default {
   },
   data() {
     return {
+      isLogged: false,
       isLoaded: false,
       GroupIsNotSelected: true,
       projects: [],
@@ -68,17 +87,17 @@ export default {
       
       reset:0,
       projectsQuery:[],
-      token:token.token,
       gitlaburl: "https://pstl.algo-prog.info/api/v4",
 
       filterTitle: [],
       Comments: [],
       CommentsProjetID: null,
+
+      usertoken: "",
+      userurl: "",
     };
   },
   created() {
-    //this.recupererNotes();
-    this.identifierUser();
   },
 
 watch: {
@@ -107,14 +126,21 @@ watch: {
     },
   },
   methods: {
-    identifierUser() {
+    login(){
+      this.gitlaburl = this.userurl + "/api/v4"
+      this.loadData();
+      this.isLogged = true;
+    },
+
+
+    loadData() {
       // recuperer l'identifiant de l'user :
       axios
         .get(this.gitlaburl + "/user/", {
           headers: {
             "Access-Control-Allow-Origin": "GET",
             "Content-Type": "application/json",
-            "PRIVATE-TOKEN": this.token,
+            "PRIVATE-TOKEN": this.usertoken,
           },
         })
 
@@ -125,7 +151,7 @@ watch: {
               headers: {
                 "Access-Control-Allow-Origin": "GET",
                 "Content-Type": "application/json",
-                "PRIVATE-TOKEN": this.token,
+                "PRIVATE-TOKEN": this.usertoken,
               },
             })
 
@@ -161,7 +187,7 @@ watch: {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
-          "PRIVATE-TOKEN": this.token,
+          "PRIVATE-TOKEN": this.usertoken,
         },
       };
 
@@ -186,7 +212,7 @@ watch: {
                 headers: {
                   "Content-Type": "application/json",
                   "Access-Control-Allow-Origin": "*",
-                  "PRIVATE-TOKEN": this.token,
+                  "PRIVATE-TOKEN": this.usertoken,
                 },
               }
             )
@@ -215,7 +241,7 @@ watch: {
             headers: {
               "Access-Control-Allow-Origin": "GET",
               "Content-Type": "application/json",
-              "PRIVATE-TOKEN": this.token,
+              "PRIVATE-TOKEN": this.usertoken,
             },
           }
         )
@@ -316,7 +342,7 @@ watch: {
             headers: {
               "Access-Control-Allow-Origin": "GET",
               "Content-Type": "application/json",
-              "PRIVATE-TOKEN": this.token,
+              "PRIVATE-TOKEN": this.usertoken,
             },
             params: {
               page: 1,
@@ -336,7 +362,7 @@ watch: {
                   headers: {
                     "Access-Control-Allow-Origin": "GET",
                     "Content-Type": "application/json",
-                    "PRIVATE-TOKEN": this.token,
+                    "PRIVATE-TOKEN": this.usertoken,
                   },
                   params: {
                     page: i,
@@ -369,7 +395,7 @@ watch: {
         headers: {
           "Access-Control-Allow-Origin": "GET",
           "Content-Type": "application/json",
-          "PRIVATE-TOKEN": this.token,
+          "PRIVATE-TOKEN": this.usertoken,
         },
         params: {
           page: 1,
@@ -391,7 +417,7 @@ watch: {
             headers: {
               "Access-Control-Allow-Origin": "GET",
               "Content-Type": "application/json",
-              "PRIVATE-TOKEN": this.token,
+              "PRIVATE-TOKEN": this.usertoken,
             },
             params: {
               page: i,
@@ -433,7 +459,7 @@ watch: {
         headers: {
           "Access-Control-Allow-Origin": "GET",
           "Content-Type": "application/json",
-          "PRIVATE-TOKEN": this.token,
+          "PRIVATE-TOKEN": this.usertoken,
         },
       });
     },
@@ -460,7 +486,7 @@ watch: {
         headers: {
           "Access-Control-Allow-Origin": "GET",
           "Content-Type": "application/json",
-          "PRIVATE-TOKEN": this.token,
+          "PRIVATE-TOKEN": this.usertoken,
         },
       });
     },
@@ -502,7 +528,7 @@ watch: {
             headers: {
                 'Access-Control-Allow-Origin': 'GET',
                 'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : this.token
+                "PRIVATE-TOKEN" : this.usertoken
             }
       })
     },
@@ -552,6 +578,78 @@ watch: {
 body {
   font-family: Arial, Helvetica, sans-serif;
   line-height: 1.4;
+}
+
+
+
+.inputholder{
+  margin-top: 0.5em;
+  display: inline-block;
+  width:90%;
+  margin-left: 1em;
+}
+.btnholder{
+  width:100%;
+  align-items: center;
+  text-align: center;
+}
+.inputlogin{
+  width:100%;
+  height:2em;
+}
+.form-input-material {
+  --input-default-border-color: white;
+  --input-border-bottom-color: white;
+}
+.loginh1{
+  text-align: center;
+  text-transform: uppercase;
+  padding: 1em;
+  font-size: 20px
+}
+.loginh2{
+  text-align: left;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.btnlogin{
+  padding: 10px 20px;
+	border-radius: 6px;
+	border-width: 2px;
+	border-style: solid;
+	font-size: 20px;
+	font-family: 'Ubuntu', sans-serif;
+	cursor: pointer;
+	transition: 0.25s ease;
+}
+.btnlogin:hover{
+  transform: scale(0.9);
+}
+
+.popup{
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  width: 50%;
+  background-color: brown;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 10px;
+
+
+  align-items: center;
+  padding: 50px 40px;
+  color: white;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 0.4px 0.4px rgba(128, 128, 128, 0.109),
+    0 1px 1px rgba(128, 128, 128, 0.155),
+    0 2.1px 2.1px rgba(128, 128, 128, 0.195),
+    0 4.4px 4.4px rgba(128, 128, 128, 0.241),
+    0 12px 12px rgba(128, 128, 128, 0.35);
+
+  
 }
 
 .flexContainer {
