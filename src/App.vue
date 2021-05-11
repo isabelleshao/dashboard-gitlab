@@ -7,6 +7,7 @@
         @new-search="addSearch2"
         @resetsearch="resetsearch"
         v-bind:token="this.token"
+          v-bind:Comments="Comments"
       />
 
       <GroupSelection
