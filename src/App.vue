@@ -25,7 +25,12 @@
       <FilterPanel
         @new-search="addSearch2"
         @resetsearch="resetsearch"
+<<<<<<< HEAD
         v-bind:token="this.usertoken"
+=======
+        v-bind:token="this.token"
+          v-bind:Comments="Comments"
+>>>>>>> reload
       />
 
       <GroupSelection
@@ -56,6 +61,8 @@
         @loadedPipelinesProjectList="loadPipelinesApp"
         v-else-if="!GroupIsNotSelected"
       />
+<br>
+            
     </div>
   </div>
 </template>
@@ -76,6 +83,7 @@ export default {
     FilterPanel,
     ProjectListQuery,
     GroupSelection,
+ 
   },
   data() {
     return {
