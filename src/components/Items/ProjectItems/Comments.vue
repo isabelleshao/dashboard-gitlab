@@ -263,8 +263,8 @@ export default {
 <style scoped>
 .unfollow {
   display: inline-flex;
-  padding-left: 1em;
-  padding-right: 1em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   border: transparent;
@@ -276,6 +276,7 @@ export default {
   align-items: center;
   margin-bottom: 1em;
   font-size: 16px;
+  margin-right: 1em;
 }
 
 .comments {
@@ -345,15 +346,10 @@ div.hrefWraper {
   display: inline-block;
   width: 100%;
   height: 50%;
-  cursor: pointer;
   padding: 0.25em;
   margin-bottom: 0.1em;
 }
 
-div.hrefWraper:hover {
-  background-color: rgba(202, 202, 202, 0.64);
-  border-radius: 10px;
-}
 img {
   border-radius: 50%;
   width: 25%;
