@@ -276,7 +276,11 @@ export default {
   align-items: center;
   margin-bottom: 1em;
   font-size: 16px;
-  margin-right: 1em;
+  margin-right: 0.5em;
+}
+
+.unfollow:hover{
+  background-color: rgba(101,101,101,0.3);
 }
 
 .comments {
@@ -315,6 +319,10 @@ input[type=text] {
     margin-top: 7px;
   font-size: 16px;
 }
+.notationbtn:hover{
+  background-color: rgba(101,101,101,0.3);
+}
+
 .button-note {
   width: 100%;
   background-color: transparent;
@@ -327,7 +335,10 @@ input[type=text] {
   border-radius: 5px;
   color: black;
   margin-bottom: 1em;
+  cursor: pointer;
 }
+
+
 
 .img-note {
   width: 25px;

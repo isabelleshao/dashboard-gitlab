@@ -4,7 +4,7 @@
       <h1>Filters</h1>
       <Search @new-search="addSearch" v-bind:token="this.token" />
       <button v-on:click="resetsearch">Reset</button>
-      <div><button v-on:click="exportNote">Export note</button></div>
+      <div><button class="exportbtn" v-on:click="exportNote">Export note</button></div>
     </div>
   </div>
 </template>
@@ -110,5 +110,8 @@ button {
   margin-bottom: 7px;
   margin-top: 7px;
   font-size: 16px;
+}
+button:hover{
+  background-color: rgba(101,101,101,0.3);
 }
 </style>

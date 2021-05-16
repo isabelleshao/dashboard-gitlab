@@ -25,12 +25,8 @@
       <FilterPanel
         @new-search="addSearch2"
         @resetsearch="resetsearch"
-<<<<<<< HEAD
-        v-bind:token="this.usertoken"
-=======
         v-bind:token="this.token"
           v-bind:Comments="Comments"
->>>>>>> reload
       />
 
       <GroupSelection

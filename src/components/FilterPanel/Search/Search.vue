@@ -84,4 +84,8 @@ input[type="submit"] {
     margin-top: 7px;
   font-size: 16px;
 }
+.btn:hover {
+  background-color: rgba(101,101,101,0.3);
+}
+
 </style>
