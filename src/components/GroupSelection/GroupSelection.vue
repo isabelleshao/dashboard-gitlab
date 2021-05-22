@@ -35,9 +35,7 @@ export default {
     }
     })
     .then((res) => {
-    this.project_group = res.data
-
-    // this.$emit("loadedTags",this.tags)
+      this.project_group = res.data
     })
     .catch((error) => {
     console.error(error)

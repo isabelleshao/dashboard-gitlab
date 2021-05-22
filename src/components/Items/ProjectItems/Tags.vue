@@ -13,7 +13,7 @@
         name: "Tags",
         components:{
         },
-        props: ["project","token"],
+        props: ["project","token","refresh"],
 
         data(){
             return{
@@ -24,38 +24,44 @@
             openTagLink(link){
                 window.open(link,"_blank")
             },
+            loadDataTags(){
+                if(this.project.tags){
+                    this.tags = this.project.tags
+                }
+                else{
+                    axios.get(this.project._links.self + "/repository/tags",{
+                    headers: {
+                        'Access-Control-Allow-Origin': 'GET',
+                        'Content-Type': 'application/json',
+                        "PRIVATE-TOKEN" : this.$props.token
+                    }
+                    })
+                    .then((res) => {
+                    this.tags = res.data
+                    this.$emit("loadedTags",this.tags)
+                    })
+                    .catch((error) => {
+                    console.error(error)
+                    })
+                }
+            }
         },
 
         created(){
-            // Loads tags of project
-            if(this.project.tags){
-                this.tags = this.project.tags
-            }
-            else{
-                axios.get(this.project._links.self + "/repository/tags",{
-                headers: {
-                    'Access-Control-Allow-Origin': 'GET',
-                    'Content-Type': 'application/json',
-                    "PRIVATE-TOKEN" : this.$props.token
-                }
-                })
-                .then((res) => {
-                this.tags = res.data
-                this.$emit("loadedTags",this.tags)
-                })
-                .catch((error) => {
-                console.error(error)
-                })
-            }
-
+            this.loadDataTags()
         },
+
+        watch:{
+            refresh:function(){
+                this.loadDataTags();
+            }
+        }
     }
 </script>
 
 <style scoped>
 .tagsContainer{
-        display: inline-table;
-        width: 40%;
+        display: contents;
     }
 .tag{
     float: left;
