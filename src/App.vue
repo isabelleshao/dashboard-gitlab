@@ -107,7 +107,6 @@ export default {
 watch: {
     projects: function (newVal) {
       var projectTitleToDisplay = [];
-      console.log(this.filterTitle);
       if (this.filterTitle.length > 0) {
         for (var proj of newVal) {
           var toAdd = true;
@@ -199,7 +198,6 @@ watch: {
         .post(this.gitlaburl + "/projects", { name: "notes" }, axiosConfig)
         .then((res) => {
                    this.CommentsProjetID = res.data.id;
-          console.log("RESPONSE RECEIVED: ", res);
 
           axios
             .post(
@@ -221,15 +219,13 @@ watch: {
               }
             )
             .then((res) => {
-              console.log("RESPONSE RECEIVED: ", res);
-     
+              console.log("RESPONSE RECEIVED: ", res);     
             })
             .catch((err) => {
               console.log("AXIOS ERROR: ", err);
             });
         })
         .catch((err) => {
-          console.log("projet errrrr");
           console.log("AXIOS ERROR: ", err);
         });
     },
@@ -384,7 +380,6 @@ watch: {
                 });
             }
             this.projects = projectsToDisplay;
-            console.log(this.projets);
           })
           .catch((error) => {
             console.error(error);

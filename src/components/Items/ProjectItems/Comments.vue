@@ -180,7 +180,6 @@ export default {
       }else{
       for (var i = 0; i < this.Comments.length; i++) {
         if (this.project.id == this.Comments[i].idProjet) {
-          console.log("test")
            // this.Comments[i].idProjet= this.project.id,
             this.Comments[i].commentaire= this.commentaire,
             this.Comments[i].unfollow= this.unfollow,
@@ -252,7 +251,6 @@ export default {
         }
       }
        //////////////nforme le parent 
-                console.log("j'emets"+ this.estAJour)
          this.$emit('childMessage', this.estAJour); 
 
          }

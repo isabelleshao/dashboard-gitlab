@@ -24,9 +24,7 @@ export default {
   },
   methods: {
     addSearch(s) {
-      console.log("A" + this.projects);
       this.projects = s;
-      console.log(this.projects);
       this.$emit("new-search", s);
     },
     resetsearch() {
@@ -66,7 +64,6 @@ export default {
             "\n";
         });
       });
-      console.log(csvContent);
 
       var encodedUri = encodeURI(csvContent);
       var link = document.createElement("a");
