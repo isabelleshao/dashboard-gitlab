@@ -283,11 +283,13 @@ export default {
     },
 
     resetsearch() {
-      this.filterTitle = [];
-      if (this.projectsQuery.length != this.projects.length) {
+      if(this.projectsQuery.length != this.projects.length) {
+        this.filterTitle = [];
         this.reset = this.reset + 1;
         this.projectsQuery = this.projects;
       }
+      
+      
     },
 
     async addSearch2(s) {
