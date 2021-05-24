@@ -307,13 +307,11 @@ export default {
 
       if (s.title.length > 0) {
         this.projectsQuery = await this.getProjectByName(s.title);
-        this.reset = this.reset + 1;
-        console.log(this.projectsQuery)
         this.isLoaded = true;
-        
       }
+
       if (s.user.length > 0) {
-        this.projectsQuery = await this.getProjectByUser(s.user);
+        await this.getProjectByUser(s.user);
         this.isLoaded = true;
       }
 
@@ -419,6 +417,7 @@ export default {
             ? temp.push(element)
             : null
         );
+        this.reset += 1;
         return temp;
       }
     },
@@ -437,6 +436,7 @@ export default {
     async getProjectByUser(strMember) {
       var userSearch = strMember.toUpperCase();
 
+      console.log(this.projectsQuery)
       var projectTemp = this.projectsQuery;
       this.projectsQuery = [];
 
