@@ -306,8 +306,11 @@ export default {
       }
 
       if (s.title.length > 0) {
-        this.projectsQuery = this.getProjectByName(s.title);
+        this.projectsQuery = await this.getProjectByName(s.title);
+        this.reset = this.reset + 1;
+        console.log(this.projectsQuery)
         this.isLoaded = true;
+        
       }
       if (s.user.length > 0) {
         this.projectsQuery = await this.getProjectByUser(s.user);
@@ -403,18 +406,19 @@ export default {
         },
       });
     },
-    getProjectByName(strName) {
+
+    async getProjectByName(strName) {
       // retourne liste des projets matchant avec le nom du projet
       var temp = [];
       if (strName.length == 0) {
         return this.projectsQuery;
       } else {
         this.projectsQuery.forEach((element) =>
+
           element.name.toLowerCase().includes(strName.toLowerCase())
             ? temp.push(element)
             : null
         );
-
         return temp;
       }
     },

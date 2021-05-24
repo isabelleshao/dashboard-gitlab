@@ -40,17 +40,29 @@ export default {
       this.indexAt = 0;
       this.projectsDisplay = [];
     },
-    projects: async function(newVal) { // watch it
+    projects: async function(newVal, oldVal) { // watch it
         if(newVal !== undefined){
-            if(this.indexAt < this.max_projects_display){  
-            var projectToAdd = this.max_projects_display
-
-            if(newVal.length < this.indexAt + projectToAdd){
-              projectToAdd = newVal.length - this.indexAt
+            if(oldVal !== undefined){
+              if(newVal.length < oldVal.length){
+                this.projectsDisplay = newVal
+                return;
+              }
             }
-          
-            this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
-            this.indexAt = this.indexAt + projectToAdd
+            else{
+              this.projectsDisplay = newVal;
+              return;
+            }
+            
+
+            if(this.indexAt < this.max_projects_display){  
+              var projectToAdd = this.max_projects_display
+
+              if(newVal.length < this.indexAt + projectToAdd){
+                projectToAdd = newVal.length - this.indexAt
+              }
+            
+              this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
+              this.indexAt = this.indexAt + projectToAdd
           }
         }
     }
