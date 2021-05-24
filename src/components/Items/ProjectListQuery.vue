@@ -41,19 +41,22 @@ export default {
       this.projectsDisplay = [];
     },
     projects: async function(newVal, oldVal) { // watch it
+        
         if(newVal !== undefined){
             if(oldVal !== undefined){
               if(newVal.length < oldVal.length){
                 this.projectsDisplay = newVal
+                this.indexAt = newVal.length;
                 return;
               }
             }
             else{
               this.projectsDisplay = newVal;
+              this.indexAt = newVal.length;
               return;
             }
             
-
+            console.log("ADD CONCAT")
             if(this.indexAt < this.max_projects_display){  
               var projectToAdd = this.max_projects_display
 
