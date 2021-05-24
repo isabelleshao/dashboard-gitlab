@@ -56,7 +56,6 @@ export default {
               return;
             }
             
-            console.log("ADD CONCAT")
             if(this.indexAt < this.max_projects_display){  
               var projectToAdd = this.max_projects_display
 

@@ -407,7 +407,6 @@ export default {
 
     async getProjectByName(strName) {
       // retourne liste des projets matchant avec le nom du projet
-      console.log(this.projectsQuery)
       var temp = [];
       if (strName.length == 0) {
         return this.projectsQuery;
