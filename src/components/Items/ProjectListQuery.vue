@@ -1,7 +1,7 @@
 <template>
   <div class = "listProject" v-on:scroll="handleScroll">
     <div v-bind:key="project.id" v-for="project in projectsDisplay">
-        <Project v-bind:project="project" v-bind:token="token"  v-bind:Comments="Comments"  v-bind:CommentsProjetID="CommentsProjetID"
+        <Project v-bind:project="project" v-bind:token="token"    v-bind:gitlaburl="gitlaburl"  v-bind:Comments="Comments"  v-bind:CommentsProjetID="CommentsProjetID"
           @loadedMembersProject="loadMembersProjectList" 
           @loadedTagsProject="loadTagsProjectList"
           @loadedPipelinesProject="loadPipelinesProjectList"
@@ -19,7 +19,7 @@ export default {
   components: {
     Project
   },
-  props: ["projects","token", "Comments","CommentsProjetID", "upToDate", "reset"],
+  props: ["projects","token", "Comments","CommentsProjetID", "upToDate", "reset", "gitlaburl"],
   data(){
     return{
       indexAt: 0,
@@ -36,25 +36,22 @@ export default {
   },
 
   watch: { 
-    reset:function(){
+    reset: async function(){
       this.indexAt = 0;
       this.projectsDisplay = [];
     },
-    projects: async function(newVal, oldVal) { // watch it
-        if(oldVal.length > newVal.length){
-          this.indexAt = 0
-          this.projectsDisplay = []
-        }
+    projects: async function(newVal) { // watch it
+        if(newVal !== undefined){
+            if(this.indexAt < this.max_projects_display){  
+            var projectToAdd = this.max_projects_display
 
-        if(this.indexAt < this.max_projects_display){  
-          var projectToAdd = this.max_projects_display
-
-          if(newVal.length < this.indexAt + projectToAdd){
-            projectToAdd = newVal.length - this.indexAt
+            if(newVal.length < this.indexAt + projectToAdd){
+              projectToAdd = newVal.length - this.indexAt
+            }
+          
+            this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
+            this.indexAt = this.indexAt + projectToAdd
           }
-        
-          this.projectsDisplay = this.projectsDisplay.concat(newVal.slice(this.indexAt, this.indexAt + projectToAdd))
-          this.indexAt = this.indexAt + projectToAdd
         }
     }
   },

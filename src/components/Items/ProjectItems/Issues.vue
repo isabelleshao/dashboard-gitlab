@@ -39,6 +39,7 @@
         v-bind:token="token"
         v-bind:issues="issues"
         v-bind:CommentsProjetID="CommentsProjetID"
+           v-bind:gitlaburl="this.gitlaburl"
         v-bind:Comments="Comments"
         v-bind:project="this.project"
         v-on:childMessage="updateStatus"
@@ -53,7 +54,7 @@ import Comments from "./Comments";
 export default {
   name: "Issues",
   components: { Comments },
-  props: ["project", "token", "refresh", "Comments", "CommentsProjetID"],
+  props: ["project", "token", "refresh", "Comments", "CommentsProjetID","gitlaburl"],
 
   data() {
     return {
@@ -138,8 +139,6 @@ a {
 
 .rightsided {
 align-items: right;
-    /*text-align: right;
-  float: right;*/
   display: inline-block;
 }
 

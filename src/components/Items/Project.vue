@@ -53,6 +53,7 @@
       v-bind:refresh="this.refresh"
       @loadedIssues="loadIssuesProject"
       v-bind:CommentsProjetID="CommentsProjetID"
+         v-bind:gitlaburl="this.gitlaburl"
       v-bind:Comments="Comments"
     />
   </div>
@@ -74,7 +75,7 @@ export default {
 
     Issues,
   },
-  props: ["project", "token", "Comments", "CommentsProjetID"],
+  props: ["project", "token", "Comments", "CommentsProjetID", "gitlaburl"],
 
   data() {
     return {
