@@ -4,20 +4,16 @@
       <input type="text" v-model="title" name="title" placeholder="Project Name..." /><br />
       <input type="text" v-model="user"  name="user" placeholder="User Name..."/><br />
       <input type="text" v-model="tag"  name="tag" placeholder="Tag Name..."/><br />
-      <!--<input type="text" v-model="group" name="group" placeholder="Group Name..." /><br>
-    
-      <input type="text" v-model="tag" name="tag" placeholder="Tag Name..." /><br>-->
       <input type="submit" value="Submit" class="btn" />
     </form>
   </div>
 </template>
 
 <script>
-// import uuid from 'uuid';
-//import axios from "axios";
+
 export default {
   name: "SearchQuery",
-  // props: ["projects"],
+
   data() {
     return {
       user: "",
@@ -29,16 +25,6 @@ export default {
 
   methods: {
 
-
-createQuery(){
-  if (this.title.length>0){
-    return  "https://pstl.algo-prog.info/api/v4/search?scope=projects&search=" +this.title
-  }
-
-    if (this.user.length>0){
-    return  "https://pstl.algo-prog.info/api/v4/search?scope=projects&search=" +this.title
-  }
-},
     newSearch() {
       const searchRequest = {
         name: "project-name",

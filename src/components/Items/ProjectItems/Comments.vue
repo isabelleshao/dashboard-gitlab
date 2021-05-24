@@ -60,7 +60,7 @@
 import axios from "axios";
 export default {
   name: "Comments",
-  props: ["Comments", "token", "project", "CommentsProjetID", "issues"],
+  props: ["Comments", "token", "project", "CommentsProjetID", "issues", "gitlaburl"],
 
   data() {
     return {
@@ -69,7 +69,7 @@ export default {
       unfollow: false,
       dateLu: new Date("1970-01-01Z00:00:00:000"),
       estAJour: false,
-      estExistant: false, // doit-on creer une nouvelle entrée JSON ou ecraser une entrée JSON
+      estExistant: false,
       commentaire: "", //format string
       notation: "",
     };
@@ -98,16 +98,6 @@ export default {
     },
 
     displayMarquerLu() {
-      /* Statut vert : 
-          "clic sur le bouton lu" || clic sur ne plus suivre
-
-          Statut orange
-
-          Si projet toujours suivi : 
-          si la date du dernier "lu" est antérieure à la date du dernier commit 
-          ET qu'on suiçt toujours le projet
-          */
-
       return this.estAJour ? "Marquer non lu" : "Marquer  lu";
     },
 
@@ -147,9 +137,7 @@ export default {
          // si ca provient du textarea des commentaires
             this.notation = this.$refs.notation.value;
       }
-      /////////////////////// FIN UPDATE VAR LOCALE
 
-///////////////// DEBUT CREATION VAR TEMP 
 
       // recuperation des membres du projet
       var membres = [];
@@ -162,7 +150,7 @@ export default {
       });
 
 
-///////////////// DEBUT UPDATE OBJET COMMENTS 
+
       //  si l'entrée n'est pas definie, creer l'entrée
       if (!this.estExistant) {
           this.Comments.push({
@@ -180,11 +168,8 @@ export default {
       }else{
       for (var i = 0; i < this.Comments.length; i++) {
         if (this.project.id == this.Comments[i].idProjet) {
-           // this.Comments[i].idProjet= this.project.id,
             this.Comments[i].commentaire= this.commentaire,
             this.Comments[i].unfollow= this.unfollow,
-           // this.Comments[i].link= this.project._links.self,
-           // this.Comments[i].groupe= this.project.forked_from_project.name_with_namespace,
             this.Comments[i].etudiants= membres,
             this.Comments[i].lu= this.dateLu,
             this.Comments[i].estAjour= this.estAJour,
@@ -194,7 +179,7 @@ export default {
       }
       }
 
-///////////////// DEBUT POST JSON
+
       var putData = {
         branch: "master",
         content: JSON.stringify(this.Comments),
@@ -211,7 +196,7 @@ export default {
 
       axios
         .put(
-          "https://pstl.algo-prog.info/api/v4/projects/" +
+          this.gitlaburl+"/projects/" +
             this.CommentsProjetID +
             "/repository/files/notes.json",
           putData,
@@ -229,7 +214,7 @@ export default {
             this.$refs.bouton1.textContent = "Enregistrement echoué";
           }
         });
-   //////////////nforme le parent 
+
          this.$emit('childMessage', this.estAJour); 
          },
   },
@@ -250,7 +235,6 @@ export default {
           this.notation = this.Comments[i].notation;
         }
       }
-       //////////////nforme le parent 
          this.$emit('childMessage', this.estAJour); 
 
          }
@@ -281,12 +265,7 @@ export default {
   background-color: rgba(101,101,101,0.3);
 }
 
-.comments {
-   /* align-items: right;
-  text-align: right;
-  float: right;
-display: inline-block;*/
-}
+
 .notation{
    display: flex;
   justify-content: space-between;
@@ -337,7 +316,6 @@ input[type=text] {
 }
 
 
-
 .img-note {
   width: 25px;
   border-radius: 1px;
@@ -362,11 +340,9 @@ div.hrefWraper {
 img {
   border-radius: 50%;
   width: 25%;
-  /*float: left;*/
   margin-top: 0.25em;
 }
 p {
- /* margin: auto;*/
   padding: 0.5em;
   display: inline-block;
 }

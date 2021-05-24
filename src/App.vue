@@ -3,20 +3,34 @@
     <Header />
 
     <div class="popup" v-if="!isLogged">
-      <h1 class = "loginh1"> Se connecter </h1>
+      <h1 class="loginh1">Se connecter</h1>
       <form @submit.prevent="login">
-        <div class = "inputholder">
+        <div class="inputholder">
           <label for="userurl"> Gitlab URL </label>
-          <input class = "inputlogin" type="text" v-model="userurl" required name="userurl" placeholder="" />
+          <input
+            class="inputlogin"
+            type="text"
+            v-model="userurl"
+            required
+            name="userurl"
+            placeholder=""
+          />
           <br />
         </div>
-        <div class = "inputholder">
+        <div class="inputholder">
           <label for="usertoken"> Token </label>
-          <input class = "inputlogin" required type="password" v-model="usertoken" name="usertoken" placeholder=""/><br />    
-          <br/>
+          <input
+            class="inputlogin"
+            required
+            type="password"
+            v-model="usertoken"
+            name="usertoken"
+            placeholder=""
+          /><br />
+          <br />
         </div>
         <div class="btnholder">
-          <input class = "btnlogin" type="submit" value="Se connecter" />
+          <input class="btnlogin" type="submit" value="Se connecter" />
         </div>
       </form>
     </div>
@@ -25,8 +39,7 @@
       <FilterPanel
         @new-search="addSearch2"
         @resetsearch="resetsearch"
-        v-bind:token="this.token"
-          v-bind:Comments="Comments"
+        v-bind:Comments="Comments"
       />
 
       <GroupSelection
@@ -41,31 +54,22 @@
         v-bind:token="this.usertoken"
         v-bind:Comments="Comments"
         v-bind:CommentsProjetID="CommentsProjetID"
+        v-bind:gitlaburl="this.gitlaburl"
         v-if="isLoaded & !GroupIsNotSelected"
-              v-bind:reset="this.reset"
-        @loadedMembersProjectList="loadMembersApp"
-        @loadedTagsProjectList="loadTagsApp" 
-        @loadedPipelinesProjectList="loadPipelinesApp" 
-        @loadedIssuesProjectList="loadIssuesApp"
-      />
-      <ProjectList
-        v-bind:projects="projects"
-        v-bind:token="this.usertoken"
+        v-bind:reset="this.reset"
         @loadedMembersProjectList="loadMembersApp"
         @loadedTagsProjectList="loadTagsApp"
-                @loadedIssuesProjectList="loadIssuesApp"
         @loadedPipelinesProjectList="loadPipelinesApp"
-        v-else-if="!GroupIsNotSelected"
+        @loadedIssuesProjectList="loadIssuesApp"
       />
-<br>
-            
+
+      <br />
     </div>
   </div>
 </template>
 
 <script>
 import Header from "./components/TopPanel/Header";
-import ProjectList from "./components/Items/ProjectList";
 import ProjectListQuery from "./components/Items/ProjectListQuery";
 import FilterPanel from "./components/FilterPanel/FilterPanel";
 import GroupSelection from "./components/GroupSelection/GroupSelection";
@@ -75,11 +79,9 @@ export default {
   name: "app",
   components: {
     Header,
-    ProjectList,
     FilterPanel,
     ProjectListQuery,
     GroupSelection,
- 
   },
   data() {
     return {
@@ -88,10 +90,10 @@ export default {
       GroupIsNotSelected: true,
       projects: [],
       filterIn: [],
-      
-      reset:0,
-      projectsQuery:[],
-      gitlaburl: "https://pstl.algo-prog.info/api/v4",
+
+      reset: 0,
+      projectsQuery: [],
+      gitlaburl: "",
 
       filterTitle: [],
       Comments: [],
@@ -101,10 +103,9 @@ export default {
       userurl: "",
     };
   },
-  created() {
-  },
+  created() {},
 
-watch: {
+  watch: {
     projects: function (newVal) {
       var projectTitleToDisplay = [];
       if (this.filterTitle.length > 0) {
@@ -129,12 +130,11 @@ watch: {
     },
   },
   methods: {
-    login(){
-      this.gitlaburl = this.userurl + "/api/v4"
+    login() {
+      this.gitlaburl = this.userurl + "/api/v4";
       this.loadData();
       this.isLogged = true;
     },
-
 
     loadData() {
       // recuperer l'identifiant de l'user :
@@ -197,7 +197,7 @@ watch: {
       axios
         .post(this.gitlaburl + "/projects", { name: "notes" }, axiosConfig)
         .then((res) => {
-                   this.CommentsProjetID = res.data.id;
+          this.CommentsProjetID = res.data.id;
 
           axios
             .post(
@@ -219,7 +219,7 @@ watch: {
               }
             )
             .then((res) => {
-              console.log("RESPONSE RECEIVED: ", res);     
+              console.log("RESPONSE RECEIVED: ", res);
             })
             .catch((err) => {
               console.log("AXIOS ERROR: ", err);
@@ -274,20 +274,22 @@ watch: {
         }
       }
     },
-    loadIssuesApp(id, issues){
-      for(const proj of this.projects){
-        if(proj.id == id){
-          proj.issues = issues
+    loadIssuesApp(id, issues) {
+      for (const proj of this.projects) {
+        if (proj.id == id) {
+          proj.issues = issues;
         }
       }
     },
 
     resetsearch() {
-      this.filterTitle = []
-      if(this.projectsQuery.length != this.projects.length){
-        this.reset = this.reset + 1
-        this.projectsQuery = this.projects
+      if(this.projectsQuery.length != this.projects.length) {
+        this.filterTitle = [];
+        this.reset = this.reset + 1;
+        this.projectsQuery = this.projects;
       }
+      
+      
     },
 
     async addSearch2(s) {
@@ -303,38 +305,18 @@ watch: {
         this.projectsQuery = await this.getProjectByUser(s.user);
         this.isLoaded = true;
       }
-      if(s.user.length > 0){
-        this.getProjectByUser(s.user)
-        this.isLoaded = true
-      }
-      if(s.tag.length > 0){
-        this.getProjectByTag(s.tag)
-        this.isLoaded = true
-      } 
-      
 
-      /*
-      if (s.user.length > 0) {
-        this.projects =  this.getProjectByUser(s.user);
-      } else {
-        this.isLoaded = false;
-        // this.projects = this.getProjectByName(s.title);
+      if (s.tag.length > 0) {
+        this.getProjectByTag(s.tag);
+        this.isLoaded = true;
       }
-      */
-
-      //this.projects = this.getProjectByUser(s.title);
-      // console.log(s.title);
-      /*  if (s.title.length > 0) {
-        this.filterIn = this.getProjectByName(s.title);
-      }
-      this.projects = this.getProjectByName(s.title); */
     },
 
     async addGroupSearch(group) {
       const response = await this.getProjectByGroup(group);
-      const groupProjects = response.data.projects
-      var projectsToDisplay = []
-      var per_page = 100
+      const groupProjects = response.data.projects;
+      var projectsToDisplay = [];
+      var per_page = 100;
 
       for (const proj of groupProjects) {
         axios
@@ -388,55 +370,6 @@ watch: {
         this.GroupIsNotSelected = false;
         this.isLoaded = true;
       }
-
-      /*
-      axios.get(proj + "/projects", {        
-        headers: {
-          "Access-Control-Allow-Origin": "GET",
-          "Content-Type": "application/json",
-          "PRIVATE-TOKEN": this.usertoken,
-        },
-        params: {
-          page: 1,
-          per_page: 100
-        }
-      })
-      .then((res) => {
-        this.projects = res.data;
-        this.projectsQuery = res.data;
-
-        
-        var totalPages = res.headers["x-total-pages"];
-        var i;
-        
-
-        for(i = 2; i<totalPages; i++){
-          axios
-          .get(this.gitlaburl + "/projects", {        
-            headers: {
-              "Access-Control-Allow-Origin": "GET",
-              "Content-Type": "application/json",
-              "PRIVATE-TOKEN": this.usertoken,
-            },
-            params: {
-              page: i,
-              per_page: per_page
-            }
-          })
-          .then((resNextProj) => {
-              for(var j = 0; j < resNextProj.data.length; j++){
-                this.projects.push(resNextProj.data[j])
-              }
-            })
-          .catch((error) => {
-            console.error(error);
-          });
-        }
-        })
-        .catch((error) => {
-          console.error(error);
-        })
-      */
     },
 
     addSearch(s) {
@@ -478,7 +411,6 @@ watch: {
       }
     },
 
-    ////////////////////////////////////////////////////
     getProjectByUser_aux(proj) {
       //pour chaque projet, recupère la liste des membres et la renvoit
       return axios.get(proj._links.members, {
@@ -491,77 +423,86 @@ watch: {
     },
 
     async getProjectByUser(strMember) {
-        var userSearch = strMember.toUpperCase()
-        
-        var projectTemp = this.projectsQuery
-        this.projectsQuery = [];
+      var userSearch = strMember.toUpperCase();
 
+      var projectTemp = this.projectsQuery;
+      this.projectsQuery = [];
 
-        const size = projectTemp.length
-        for(var i = 0; i < size ; i++){ 
-          var listUserProject 
-          if(!projectTemp[i].members){
-            listUserProject = (await this.getProjectByUser_aux(projectTemp[i])).data;
-            projectTemp[i].members = listUserProject
-            this.loadMembersApp(projectTemp[i].id, listUserProject)
-          }else{
-            listUserProject = projectTemp[i].members;
+      const size = projectTemp.length;
+      for (var i = 0; i < size; i++) {
+        var listUserProject;
+        if (!projectTemp[i].members) {
+          listUserProject = (await this.getProjectByUser_aux(projectTemp[i]))
+            .data;
+          projectTemp[i].members = listUserProject;
+          this.loadMembersApp(projectTemp[i].id, listUserProject);
+        } else {
+          listUserProject = projectTemp[i].members;
+        }
+        for (var k = 0; k < listUserProject.length; k++) {
+          var userUsername = listUserProject[k]["name"]
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase();
+          var userName = listUserProject[k]["username"]
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase();
+
+          if (
+            userName.includes(userSearch) ||
+            userUsername.includes(userSearch)
+          ) {
+            this.projectsQuery.push(projectTemp[i]);
+            this.reset += 1;
           }
-          for (var k = 0; k < listUserProject.length; k++) {
-            var userUsername = listUserProject[k]['name'].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
-            var userName = listUserProject[k]['username'].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
+        }
+      }
+    },
 
-            if(userName.includes(userSearch) || userUsername.includes(userSearch)){
-              this.projectsQuery.push(projectTemp[i])
+    getProjectByTag_aux(proj) {
+      //pour chaque projet, recupère la liste des membres et la renvoit
+      return axios.get(proj._links.self + "/repository/tags", {
+        headers: {
+          "Access-Control-Allow-Origin": "GET",
+          "Content-Type": "application/json",
+          "PRIVATE-TOKEN": this.usertoken,
+        },
+      });
+    },
+
+    async getProjectByTag(strTag) {
+      var tagSearch = strTag.toUpperCase();
+
+      var projectTemp = this.projectsQuery;
+      this.projectsQuery = [];
+
+      const size = projectTemp.length;
+
+      for (var i = 0; i < size; i++) {
+        var listTagProject;
+        if (!projectTemp[i].tags) {
+          listTagProject = (await this.getProjectByTag_aux(projectTemp[i]))
+            .data;
+          projectTemp[i].tags = listTagProject;
+          this.loadTagsApp(projectTemp[i].id, listTagProject);
+        } else {
+          listTagProject = projectTemp[i].tags;
+        }
+
+        for (var j = 0; j < listTagProject.length; j++) {
+          var tagName = listTagProject[j]["name"]
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase();
+          if (tagName.includes(tagSearch)) {
+            if (!this.projectsQuery.includes(projectTemp[i])) {
+              this.projectsQuery.push(projectTemp[i]);
               this.reset += 1;
             }
           }
         }
-    },
-
-    ////////////////////////////////////////////////////
-    getProjectByTag_aux(proj) {
-      //pour chaque projet, recupère la liste des membres et la renvoit
-      return axios
-      .get(proj._links.self + "/repository/tags",{
-            headers: {
-                'Access-Control-Allow-Origin': 'GET',
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN" : this.usertoken
-            }
-      })
-    },
-
-    async getProjectByTag(strTag) {
-        var tagSearch = strTag.toUpperCase()
-
-        var projectTemp = this.projectsQuery
-        this.projectsQuery = [];
-
-
-        const size = projectTemp.length
-
-        for(var i = 0; i < size ; i++){ 
-          var listTagProject 
-          if(!projectTemp[i].tags){
-            listTagProject = (await this.getProjectByTag_aux(projectTemp[i])).data;
-            projectTemp[i].tags = listTagProject
-            this.loadTagsApp(projectTemp[i].id, listTagProject)
-          }else{
-            listTagProject = projectTemp[i].tags;
-          }
-
-          for(var j = 0; j < listTagProject.length; j++){
-            var tagName = listTagProject[j]['name'].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
-            if(tagName.includes(tagSearch)){
-              if(!this.projectsQuery.includes(projectTemp[i])){
-                this.projectsQuery.push(projectTemp[i])
-                this.reset += 1;
-              }
-            }
-
-          }
-        }
+      }
     },
   },
 };
@@ -579,54 +520,52 @@ body {
   line-height: 1.4;
 }
 
-
-
-.inputholder{
+.inputholder {
   margin-top: 0.5em;
   display: inline-block;
-  width:90%;
+  width: 90%;
   margin-left: 1em;
 }
-.btnholder{
-  width:100%;
+.btnholder {
+  width: 100%;
   align-items: center;
   text-align: center;
 }
-.inputlogin{
-  width:100%;
-  height:2em;
+.inputlogin {
+  width: 100%;
+  height: 2em;
 }
 .form-input-material {
   --input-default-border-color: white;
   --input-border-bottom-color: white;
 }
-.loginh1{
+.loginh1 {
   text-align: center;
   text-transform: uppercase;
   padding: 1em;
-  font-size: 20px
+  font-size: 20px;
 }
-.loginh2{
+.loginh2 {
   text-align: left;
   font-size: 15px;
   font-weight: 600;
 }
 
-.btnlogin{
+.btnlogin {
   padding: 10px 20px;
-	border-radius: 6px;
-	border-width: 2px;
-	border-style: solid;
-	font-size: 20px;
-	font-family: 'Ubuntu', sans-serif;
-	cursor: pointer;
-	transition: 0.25s ease;
+  border-radius: 6px;
+  border-width: 2px;
+  border-style: solid;
+  font-size: 20px;
+  font-family: "Ubuntu", sans-serif;
+  cursor: pointer;
+  transition: 0.25s ease;
 }
-.btnlogin:hover{
+.btnlogin:hover {
   transform: scale(0.9);
 }
 
-.popup{
+.popup {
   position: fixed;
   top: 30%;
   left: 50%;
@@ -635,7 +574,6 @@ body {
   z-index: 1;
   transform: translate(-50%, -50%);
   border-radius: 10px;
-
 
   align-items: center;
   padding: 50px 40px;
@@ -647,8 +585,6 @@ body {
     0 2.1px 2.1px rgba(128, 128, 128, 0.195),
     0 4.4px 4.4px rgba(128, 128, 128, 0.241),
     0 12px 12px rgba(128, 128, 128, 0.35);
-
-  
 }
 
 .flexContainer {

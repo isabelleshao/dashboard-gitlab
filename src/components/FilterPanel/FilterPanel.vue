@@ -2,7 +2,7 @@
   <div class="header">
     <div class="sticky">
       <h1>Filters</h1>
-      <Search @new-search="addSearch" v-bind:token="this.token" />
+      <Search @new-search="addSearch" />
       <button v-on:click="resetsearch">Reset</button>
       <div><button class="exportbtn" v-on:click="exportNote">Export note</button></div>
     </div>
@@ -16,10 +16,11 @@ export default {
   components: {
     Search,
   },
-  props: ["token", "Comments"],
+  props: ["Comments"],
   data() {
     return {
       projects: null,
+      
     };
   },
   methods: {
@@ -31,10 +32,7 @@ export default {
       this.$emit("resetsearch");
     },
     exportNote() {
-      /*        
-      console.log(this.Comments)*/
 
-      //
       var header = [
         "Groupe",
         "idProjet",
